@@ -7,13 +7,34 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Login from './Screens/Authentication/Login';
 import DashBoard from './Screens/DashBoard/DashBoard';
 import SplashScreen from './Screens/SplashScreen/SplashScreen';
-const Stack = createNativeStackNavigator();
 
+import EncryptedStorage from 'react-native-encrypted-storage';
+import RNRestart from 'react-native-restart';
+global.server = 'http://192.168.43.14';
+const Stack = createNativeStackNavigator();
 export default function App() {
-  const [isLoading, setLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setLoading] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
+
+  async function retrieveUserSession() {
+    try {
+      const session = await EncryptedStorage.getItem('user_session');
+      if (session !== undefined && session != null) {
+        setIsLogin(true);
+      } else {
+        await EncryptedStorage.clear();
+        setIsLogin(false);
+      }
+      setLoading(false);
+    } catch (error) {
+      await EncryptedStorage.clear();
+      RNRestart.Restart();
+      setLoading(false);
+    }
+  }
 
   if (isLoading) {
+    retrieveUserSession();
     return (
       <NavigationContainer>
         <Stack.Navigator>

@@ -15,6 +15,17 @@ import {
 } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import RNRestart from 'react-native-restart';
+
+async function clearStorage() {
+  try {
+    await EncryptedStorage.clear();
+    RNRestart.Restart();
+  } catch (error) {
+    RNRestart.Restart();
+  }
+}
 
 export function DrawerContent(props) {
   const getProfileDiv = () => {
@@ -167,6 +178,7 @@ export function DrawerContent(props) {
               <Icon name="exit-to-app" color={color} size={size} />
             )}
             label="Sign out"
+            onPress={() => clearStorage()}
           />
         </Drawer.Section>
       </ScrollView>

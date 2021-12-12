@@ -1,17 +1,91 @@
-import React from 'react';
-import {TextInput, Button} from 'react-native-paper';
+import React, {useState} from 'react';
+import {TextInput} from 'react-native-paper';
 import {
   SafeAreaView,
+  ActivityIndicator,
   View,
   Text,
   StyleSheet,
   Image,
-  //   TextInput,
+  TouchableOpacity,
 } from 'react-native';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import RNRestart from 'react-native-restart';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+
+  const [isLoading, setLoading] = useState(false);
+
+  async function storeUserSession(token) {
+    try {
+      await EncryptedStorage.setItem(
+        'user_session',
+        JSON.stringify({
+          token: token,
+        }),
+      );
+    } catch (error) {
+      await EncryptedStorage.clear();
+      RNRestart.Restart();
+    }
+  }
+
+  async function Login() {
+    if (email == '' || email == null || email == undefined) {
+      setEmailError(true);
+      return;
+    }
+    if (password == '' || password == null || password == undefined) {
+      setPasswordError(true);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${global.server}/admin/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const res = JSON.parse(await response.text());
+      if (res.status === 'success') {
+        storeUserSession(res.token);
+        setLoading(false);
+        RNRestart.Restart();
+      } else {
+        alert('Un Authorized Access');
+        setLoading(false);
+      }
+    } catch (error) {
+      alert('Check Internet Connection or Restart App');
+      setLoading(false);
+    }
+  }
+
+  function LoadingPage() {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingPage}>
+          <ActivityIndicator size={45} color="black" />
+        </View>
+      );
+    } else {
+      return <></>;
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
+      <LoadingPage />
       <View style={styles.holder}>
         <View style={styles.brand}>
           <Image style={styles.icon} source={require('../Assets/icon.png')} />
@@ -21,8 +95,8 @@ export default function Login() {
           <Text style={styles.loginHeading}>Login</Text>
           <Text style={styles.loginLabel}>Email</Text>
           <TextInput
+            error={emailError}
             mode="outlined"
-            // label="Email"
             color="black"
             selectionColor="black"
             underlineColor="gray"
@@ -31,14 +105,18 @@ export default function Login() {
             activeOutlineColor="black"
             style={styles.loginInput}
             keyboardType="email-address"
-            // backgroundColor="rgb(240, 240, 240)"
+            value={email}
+            onChangeText={data => {
+              setEmail(data);
+              setEmailError(false);
+            }}
           />
 
           <Text style={styles.loginLabel}>Password</Text>
 
           <TextInput
+            error={passwordError}
             mode="outlined"
-            // label="Email"
             color="black"
             selectionColor="black"
             underlineColor="gray"
@@ -47,16 +125,17 @@ export default function Login() {
             activeOutlineColor="black"
             style={styles.loginInput}
             secureTextEntry={true}
-            // backgroundColor="rgb(240, 240, 240)"
+            value={password}
+            onChangeText={data => {
+              setPassword(data);
+              setPasswordError(false);
+            }}
           />
-          <Button
-            style={styles.loginSubmit}
-            fontSize={20}
-            color="black"
-            uppercase={false}
-            mode="outlined">
-            <Text style={{fontSize: 18, letterSpacing: 3}}>Submit</Text>
-          </Button>
+          <TouchableOpacity style={styles.loginSubmit} onPress={() => Login()}>
+            <Text style={{fontSize: 18, letterSpacing: 3, color: 'black'}}>
+              Submit
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -100,9 +179,9 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   loginPage: {
-    width: '85%',
+    width: '80%',
     height: 'auto',
-    top: 20,
+    top: 5,
     // borderColor: 'green',
     // borderWidth: 1,
   },
@@ -116,14 +195,10 @@ const styles = StyleSheet.create({
   loginInput: {
     width: '100%',
     marginTop: 5,
+    height: 40,
     marginBottom: 20,
     borderWidth: 0,
     borderRadius: 0,
-
-    // fontSize: 19,
-
-    // borderWidth: 1,
-    // borderColor: 'gray',
   },
   loginLabel: {
     fontSize: 20,
@@ -132,13 +207,22 @@ const styles = StyleSheet.create({
   loginSubmit: {
     width: '100%',
     marginTop: 20,
-    color: 'black',
     borderWidth: 1,
-    borderColor: 'gray',
-    height: 50,
-    fontSize: 20,
+    borderColor: 'black',
+    height: 40,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  loadingPage: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, .8)',
+    zIndex: 100,
+    position: 'absolute',
   },
 });
