@@ -43,7 +43,6 @@ export default function Login() {
       setPasswordError(true);
       return;
     }
-
     try {
       setLoading(true);
       const response = await fetch(`${global.server}/admin/signin`, {

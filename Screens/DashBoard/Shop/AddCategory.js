@@ -13,14 +13,29 @@ import {
 
 import {colors, Header, Icon} from 'react-native-elements';
 import {Avatar, Button, TextInput} from 'react-native-paper';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 import ImagePicker, {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
 
+const createFormData = photo => {
+  const data = new FormData();
+  data.append('photo', {
+    name: photo.assets[0].fileName,
+    type: photo.assets[0].type,
+    uri:
+      Platform.OS === 'android'
+        ? photo.assets[0].uri
+        : photo.assets[0].uri.replace('file://', ''),
+  });
+  return data;
+};
+
 export default function AddCategory({navigation}) {
   const [ImageData, setImageData] = useState();
+  const [ImageName, setImageName] = useState();
   const [categoryName, setCategoryName] = useState();
   const [categoryNameError, setCategoryNameError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,10 +58,68 @@ export default function AddCategory({navigation}) {
       setCategoryNameError(true);
       return;
     }
-    // setIsLoading(true);
-    alert('Uploded');
-    // setIsLoading(false);
+
+    try {
+      setIsLoading(true);
+
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(`${global.server}/admin/createcategory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${global.token_prefix} ${session.token}`,
+        },
+        body: JSON.stringify({
+          name: categoryName,
+          image: await uploadImage(),
+        }),
+      });
+      const res = JSON.parse(await response.text());
+      if (res.status === 'success') {
+        setCategoryName('');
+        setImageName('');
+        setImageData('');
+        setIsLoading(false);
+      } else if (res.status === 'error') {
+        setIsLoading(false);
+        alert('Server Error');
+      } else {
+        setIsLoading(false);
+        alert('Unauthorized access');
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      alert('Error');
+    }
   }
+
+  const uploadImage = async () => {
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(`${global.server}/admin/uploadimage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `${global.token_prefix} ${session.token}`,
+        },
+        body: createFormData(ImageData),
+      });
+      const res = JSON.parse(await response.text());
+      if (res.status === 'success') {
+        return res.imageName;
+      } else {
+        return 'noimage';
+      }
+    } catch (error) {
+      console.log(error);
+      alert('Error');
+    }
+  };
 
   const chooseImage = async () => {
     const result = await launchImageLibrary();

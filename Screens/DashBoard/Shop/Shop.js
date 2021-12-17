@@ -10,10 +10,73 @@ import {
 import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button, List} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const menu = [{}];
+import EncryptedStorage from 'react-native-encrypted-storage';
+const categoryProduct = [
+  {
+    name: 'Category 1',
+    products: [
+      {
+        name: 'Product 1',
+        price: 100,
+      },
+      {
+        name: 'Product 7',
+        price: 200,
+      },
+    ],
+  },
+  {
+    name: 'Category 2',
+    products: [
+      {
+        name: 'Product 2',
+        price: 100,
+      },
+      {
+        name: 'Product 8',
+        price: 200,
+      },
+    ],
+  },
+];
 
 export default function Shop({route, navigation}) {
+  const [categoryProductList, setCategoryProductList] = useState([]);
+  async function getCategoryProductList() {
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/admin/getcategoryproductlist`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      const res = JSON.parse(await response.text());
+      if (res.status === 'success') {
+        setCategoryProductList(res.data);
+      } else {
+        alert(res.message);
+        setCategoryProductList([]);
+      }
+    } catch (error) {
+      console.log(error);
+      setCategoryProductList([]);
+    }
+  }
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getCategoryProductList();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   const [bottomSheet, setBottomSheet] = useState(false);
   return (
     <>
@@ -52,52 +115,49 @@ export default function Shop({route, navigation}) {
 
       <View style={{flex: 1, width: '100%', height: '100%', zIndex: 1}}>
         <ScrollView>
-          <List.Accordion
-            onLongPress={() => navigation.navigate('EditCategory')}
-            titleStyle={{fontSize: 25, color: 'black'}}
-            title="Wallets"
-            id="1"
-            style={{backgroundColor: 'white'}}>
-            <View style={{width: '100%'}}>
-              <TouchableOpacity
-                onLongPress={() => navigation.navigate('EditProduct')}>
-                <View style={styles.foodStyle}>
-                  <Image
-                    source={{
-                      uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
-                    }}
-                    style={styles.foodImage}
-                  />
-                  <Text style={{fontSize: 22, marginLeft: 16}}>
-                    Brown Wallets
-                  </Text>
-                  <View style={{right: 10, position: 'absolute'}}>
-                    <Text style={{fontSize: 18}}>QTR 50.00</Text>
-                  </View>
+          {categoryProductList.map((category, index) => (
+            <List.Accordion
+              key={index}
+              onLongPress={() =>
+                navigation.navigate('EditCategory', {
+                  category_id: category._id,
+                  name: category.name,
+                  image: category.image,
+                })
+              }
+              titleStyle={{fontSize: 25, color: 'black'}}
+              title={category.name}
+              id="1"
+              style={{backgroundColor: 'white'}}>
+              {category.products.map((product, index2) => (
+                <View style={{width: '100%'}} key={index2}>
+                  <TouchableOpacity
+                    onLongPress={() =>
+                      navigation.navigate('EditProduct', {
+                        product_id: product._id,
+                      })
+                    }>
+                    <View style={styles.productStyle}>
+                      <Image
+                        source={{
+                          uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
+                        }}
+                        style={styles.productImage}
+                      />
+                      <Text style={{fontSize: 22, marginLeft: 16}}>
+                        {product.name}
+                      </Text>
+                      <View style={{right: 10, position: 'absolute'}}>
+                        <Text style={{fontSize: 18}}>
+                          QTR {product.price}.00
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{width: '100%'}}>
-              <TouchableOpacity
-                onLongPress={() => navigation.navigate('EditProduct')}>
-                <View style={styles.foodStyle}>
-                  <Image
-                    source={{
-                      uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
-                    }}
-                    style={styles.foodImage}
-                  />
-                  <Text style={{fontSize: 22, marginLeft: 16}}>
-                    Brown Wallets
-                  </Text>
-                  <View style={{right: 10, position: 'absolute'}}>
-                    <Text style={{fontSize: 18}}>QTR 50.00</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </List.Accordion>
+              ))}
+            </List.Accordion>
+          ))}
         </ScrollView>
       </View>
 
@@ -168,7 +228,7 @@ const styles = StyleSheet.create({
 
     // alignItems: 'center'
   },
-  foodStyle: {
+  productStyle: {
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
     paddingLeft: 10,
@@ -179,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  foodImage: {
+  productImage: {
     width: 70,
     height: 70,
     borderRadius: 35,

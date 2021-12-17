@@ -11,6 +11,7 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
 global.server = 'http://192.168.43.14';
+global.token_prefix = 'gbdleathers';
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
