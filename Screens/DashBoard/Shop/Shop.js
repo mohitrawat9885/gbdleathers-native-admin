@@ -11,34 +11,7 @@ import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button, List} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
-const categoryProduct = [
-  {
-    name: 'Category 1',
-    products: [
-      {
-        name: 'Product 1',
-        price: 100,
-      },
-      {
-        name: 'Product 7',
-        price: 200,
-      },
-    ],
-  },
-  {
-    name: 'Category 2',
-    products: [
-      {
-        name: 'Product 2',
-        price: 100,
-      },
-      {
-        name: 'Product 8',
-        price: 200,
-      },
-    ],
-  },
-];
+
 
 export default function Shop({route, navigation}) {
   const [categoryProductList, setCategoryProductList] = useState([]);
@@ -48,7 +21,7 @@ export default function Shop({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/admin/getcategoryproductlist`,
+        `${global.server}/api/v1/gbdleathers/shop/category/products`,
         {
           method: 'GET',
           headers: {

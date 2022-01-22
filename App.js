@@ -10,8 +10,8 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
-global.server = 'http://192.168.43.14';
-global.token_prefix = 'gbdleathers';
+global.server = 'http://192.168.43.14:8000';
+global.token_prefix = 'Bearer';
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function App() {
   async function retrieveUserSession() {
     try {
       const session = await EncryptedStorage.getItem('user_session');
-      if (session !== undefined && session != null) {
+      if (session) {
         setIsLogin(true);
       } else {
         await EncryptedStorage.clear();

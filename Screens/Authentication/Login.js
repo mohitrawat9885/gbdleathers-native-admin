@@ -45,16 +45,19 @@ export default function Login() {
     }
     try {
       setLoading(true);
-      const response = await fetch(`${global.server}/admin/signin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/user/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
         },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
+      );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         storeUserSession(res.token);

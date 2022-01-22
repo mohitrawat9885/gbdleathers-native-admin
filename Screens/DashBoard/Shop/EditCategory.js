@@ -20,22 +20,21 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 
-const createFormData = photo => {
-  const data = new FormData();
-  data.append('photo', {
-    name: photo.assets[0].fileName,
-    type: photo.assets[0].type,
-    uri:
-      Platform.OS === 'android'
-        ? photo.assets[0].uri
-        : photo.assets[0].uri.replace('file://', ''),
-  });
-  return data;
-};
+// const createFormData = photo => {
+//   const data = new FormData();
+//   data.append('photo', {
+//     name: photo.assets[0].fileName,
+//     type: photo.assets[0].type,
+//     uri:
+//       Platform.OS === 'android'
+//         ? photo.assets[0].uri
+//         : photo.assets[0].uri.replace('file://', ''),
+//   });
+//   return data;
+// };
 
-export default function AddCategory({route, navigation}) {
+export default function EditCategory({route, navigation}) {
   const [ImageData, setImageData] = useState();
-  const [isImageChanged, setIsImageChanged] = useState(false);
   const [ImageName, setImageName] = useState();
   const [categoryName, setCategoryName] = useState();
   const [categoryNameError, setCategoryNameError] = useState(false);
@@ -46,11 +45,11 @@ export default function AddCategory({route, navigation}) {
       {
         text: 'Cancel',
       },
-      {text: 'OK', onPress: () => UpdateCategory()},
+      {text: 'OK', onPress: () => UploadCategory()},
     ]);
   };
 
-  async function UpdateCategory() {
+  async function UploadCategory() {
     if (
       categoryName == undefined ||
       categoryName == '' ||
@@ -66,44 +65,55 @@ export default function AddCategory({route, navigation}) {
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
-      const response = await fetch(`${global.server}/admin/updatecategory`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${global.token_prefix} ${session.token}`,
+
+      const data = new FormData();
+      if (ImageData) {
+        data.append('photo', {
+          name: ImageData.assets[0].fileName,
+          type: ImageData.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? ImageData.assets[0].uri
+              : ImageData.assets[0].uri.replace('file://', ''),
+        });
+      }
+      data.append('name', categoryName);
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/category/${route.params.category_id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+          body: data,
         },
-        body: JSON.stringify({
-          category_id: route.params.category_id,
-          name: categoryName,
-          image: await uploadImage(),
-        }),
-      });
+      );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        getCategoryById();
-        setIsLoading(false);
+        // setCategoryName(null);
+        // setImageData(null);
       } else if (res.status === 'error') {
-        setIsLoading(false);
         alert('Server Error');
       } else {
-        setIsLoading(false);
         alert('Unauthorized access');
       }
-      console.log(res.message);
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
-      alert('Uploading Error');
+
+      alert('Error');
     }
+    setIsLoading(false);
   }
 
   const getCategoryById = async () => {
+    setIsLoading(true);
     try {
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/admin/getcategorybyid?categoryId=${route.params.category_id}`,
+        `${global.server}/api/v1/gbdleathers/shop/category/${route.params.category_id}`,
         {
           method: 'GET',
           headers: {
@@ -115,13 +125,13 @@ export default function AddCategory({route, navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         setCategoryName(res.data.name);
-        setIsImageChanged(false);
         setImageName(res.data.image);
       }
     } catch (error) {
       console.log(error);
       alert('Something went wrong');
     }
+    setIsLoading(false);
   };
 
   React.useEffect(() => {
@@ -131,35 +141,6 @@ export default function AddCategory({route, navigation}) {
     return unsubscribe;
   }, [navigation]);
 
-  const uploadImage = async () => {
-    if (!isImageChanged) {
-      console.log('Not Changed');
-      return ImageName;
-    }
-    try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(`${global.server}/admin/uploadimage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `${global.token_prefix} ${session.token}`,
-        },
-        body: createFormData(ImageData),
-      });
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        return res.imageName;
-      } else {
-        return 'noimage.jpg';
-      }
-    } catch (error) {
-      console.log(error);
-      alert('Image Error');
-    }
-  };
-
   const chooseImage = async () => {
     const result = await launchImageLibrary();
     if (result.didCancel) {
@@ -168,7 +149,6 @@ export default function AddCategory({route, navigation}) {
       alert('Problem Picking Image');
       return;
     } else {
-      setIsImageChanged(true);
       setImageData(result);
     }
   };
@@ -201,7 +181,7 @@ export default function AddCategory({route, navigation}) {
           }}>
           <Image
             source={{
-              uri: `${global.server}/assets/images/${ImageName}`,
+              uri: ImageName,
             }}
             style={{
               width: '100%',
@@ -247,7 +227,7 @@ export default function AddCategory({route, navigation}) {
           onPress: () => navigation.goBack(),
         }}
         centerComponent={{
-          text: 'Create New Category',
+          text: 'Edit Category',
           style: {color: 'black', fontSize: 22, justifyContent: 'center'},
         }}
         rightComponent={{

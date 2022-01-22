@@ -20,22 +20,21 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 
-const createFormData = photo => {
-  const data = new FormData();
-  data.append('photo', {
-    name: photo.assets[0].fileName,
-    type: photo.assets[0].type,
-    uri:
-      Platform.OS === 'android'
-        ? photo.assets[0].uri
-        : photo.assets[0].uri.replace('file://', ''),
-  });
-  return data;
-};
+// const createFormData = photo => {
+//   const data = new FormData();
+//   data.append('photo', {
+//     name: photo.assets[0].fileName,
+//     type: photo.assets[0].type,
+//     uri:
+//       Platform.OS === 'android'
+//         ? photo.assets[0].uri
+//         : photo.assets[0].uri.replace('file://', ''),
+//   });
+//   return data;
+// };
 
 export default function AddCategory({navigation}) {
   const [ImageData, setImageData] = useState();
-  const [ImageName, setImageName] = useState();
   const [categoryName, setCategoryName] = useState();
   const [categoryNameError, setCategoryNameError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,61 +64,45 @@ export default function AddCategory({navigation}) {
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
-      const response = await fetch(`${global.server}/admin/createcategory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${global.token_prefix} ${session.token}`,
-        },
-        body: JSON.stringify({
-          name: categoryName,
-          image: await uploadImage(),
-        }),
+
+      const data = new FormData();
+      data.append('photo', {
+        name: ImageData.assets[0].fileName,
+        type: ImageData.assets[0].type,
+        uri:
+          Platform.OS === 'android'
+            ? ImageData.assets[0].uri
+            : ImageData.assets[0].uri.replace('file://', ''),
       });
+      data.append('name', categoryName);
+
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/category`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+          body: data,
+        },
+      );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        setCategoryName('');
-        setImageName('');
-        setImageData('');
-        setIsLoading(false);
+        setCategoryName(null);
+        setImageData(null);
       } else if (res.status === 'error') {
-        setIsLoading(false);
         alert('Server Error');
       } else {
-        setIsLoading(false);
         alert('Unauthorized access');
       }
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
-      alert('Error');
-    }
-  }
 
-  const uploadImage = async () => {
-    try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(`${global.server}/admin/uploadimage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `${global.token_prefix} ${session.token}`,
-        },
-        body: createFormData(ImageData),
-      });
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        return res.imageName;
-      } else {
-        return 'noimage';
-      }
-    } catch (error) {
-      console.log(error);
       alert('Error');
     }
-  };
+    setIsLoading(false);
+  }
 
   const chooseImage = async () => {
     const result = await launchImageLibrary();

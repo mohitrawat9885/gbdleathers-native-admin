@@ -27,21 +27,11 @@ import ImagePicker, {
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-export default function EditProduct({route, navigation}) {
+export default function EditVariant({route, navigation}) {
   const [bottomSheet, setBottomSheet] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isBottomLoading, setIsBottomLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([]);
-
-  const [front_image, setFrontImage] = useState();
-  const [back_image, setBackImage] = useState();
-
-  const [frontImageName, setFrontImageName] = useState();
-  const [backImageName, setBackImageName] = useState();
-
-  const [categoryId, setCategoryId] = useState('');
-  const [categoryName, setCategoryName] = useState('No Category');
 
   const [name, setName] = useState();
   const [nameError, setNameError] = useState();
@@ -71,7 +61,7 @@ export default function EditProduct({route, navigation}) {
   const [variantDescription, setVariantDescription] = useState();
 
   const HandleSubmit = () => {
-    Alert.alert('Submit Alert', 'Update Product ?', [
+    Alert.alert('Submit Alert', 'Update Variant ?', [
       {
         text: 'Cancel',
       },
@@ -108,7 +98,7 @@ export default function EditProduct({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
         {
           method: 'POST',
           headers: {
@@ -147,29 +137,6 @@ export default function EditProduct({route, navigation}) {
 
       const data = new FormData();
 
-      if (front_image) {
-        data.append('front_image', {
-          name: front_image.assets[0].fileName,
-          type: front_image.assets[0].type,
-          uri:
-            Platform.OS === 'android'
-              ? front_image.assets[0].uri
-              : front_image.assets[0].uri.replace('file://', ''),
-        });
-      }
-      if (back_image) {
-        data.append('back_image', {
-          name: back_image.assets[0].fileName,
-          type: back_image.assets[0].type,
-          uri:
-            Platform.OS === 'android'
-              ? back_image.assets[0].uri
-              : back_image.assets[0].uri.replace('file://', ''),
-        });
-      }
-      if (categoryId) {
-        data.append('category', categoryId);
-      }
       if (name) {
         data.append('name', `${name}`);
       }
@@ -195,7 +162,7 @@ export default function EditProduct({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
         {
           method: 'PATCH',
           headers: {
@@ -212,7 +179,7 @@ export default function EditProduct({route, navigation}) {
         alert('Server Error');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Error');
     }
     setIsLoading(false);
@@ -225,7 +192,7 @@ export default function EditProduct({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
         {
           method: 'GET',
           headers: {
@@ -236,10 +203,6 @@ export default function EditProduct({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        setCategoryId(res.data.category._id);
-        setCategoryName(res.data.category.name);
-        setFrontImageName(res.data.front_image);
-        setBackImageName(res.data.back_image);
         setName(res.data.name);
         setPrice(isNaN(res.data.price) ? null : `${res.data.price}`);
         setStock(isNaN(res.data.stock) ? null : `${res.data.stock}`);
@@ -258,144 +221,13 @@ export default function EditProduct({route, navigation}) {
     setIsLoading(false);
   };
 
-  const getAllCategorys = async () => {
-    try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/category`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${global.token_prefix} ${session.token}`,
-          },
-        },
-      );
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        setCategoryList(res.data);
-      } else {
-        setCategoryList([]);
-      }
-    } catch (error) {
-      setCategoryList([]);
-    }
-  };
-
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getAllCategorys();
       getProduct();
-      // getCategoryProductList();
     });
     return unsubscribe;
   }, [navigation]);
 
-  const ChooseFrontImage = async () => {
-    const result = await launchImageLibrary();
-    if (result.didCancel) {
-      return;
-    } else if (result.error) {
-      alert('Problem Picking Image');
-      return;
-    } else {
-      setFrontImage(result);
-    }
-  };
-
-  const ChooseBackImage = async () => {
-    const result = await launchImageLibrary();
-    if (result.didCancel) {
-      return;
-    } else if (result.error) {
-      alert('Problem Picking Image');
-      return;
-    } else {
-      setBackImage(result);
-    }
-  };
-
-  function RenderFrontImage() {
-    if (front_image) {
-      return (
-        <Image
-          source={{
-            uri: front_image.assets[0].uri,
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      );
-    } else {
-      return (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 2,
-            backgroundColor: 'rgb(230, 235, 235)',
-            borderColor: 'lightgray',
-          }}>
-          <Image
-            source={{
-              uri: frontImageName,
-            }}
-            style={{
-              width: '40%',
-              height: '40%',
-            }}
-          />
-        </View>
-      );
-    }
-  }
-
-  function RenderBackImage() {
-    if (back_image) {
-      return (
-        <Image
-          source={{
-            uri: back_image.assets[0].uri,
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      );
-    } else {
-      return (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 2,
-            backgroundColor: 'rgb(230, 235, 235)',
-            borderColor: 'lightgray',
-          }}>
-          <Image
-            source={{
-              uri: backImageName,
-            }}
-            style={{
-              width: '40%',
-              height: '40%',
-            }}
-          />
-        </View>
-      );
-    }
-  }
   function LoadingPage() {
     if (isLoading) {
       return (
@@ -452,7 +284,7 @@ export default function EditProduct({route, navigation}) {
           onPress: () => navigation.goBack(),
         }}
         centerComponent={{
-          text: 'Update Product',
+          text: 'Update Variant',
           style: {color: 'black', fontSize: 22, justifyContent: 'center'},
         }}
         rightComponent={
@@ -476,42 +308,6 @@ export default function EditProduct({route, navigation}) {
       <LoadingPage />
       <ScrollView>
         <View style={styles.container}>
-          <TouchableOpacity
-            style={{
-              width: 400,
-              marginTop: 10,
-              marginBottom: 10,
-              height: 400,
-            }}
-            onPress={() => ChooseFrontImage()}>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {RenderFrontImage()}
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              width: 400,
-              marginTop: 10,
-              marginBottom: 10,
-              height: 400,
-            }}
-            onPress={() => ChooseBackImage()}>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {RenderBackImage()}
-            </View>
-          </TouchableOpacity>
-
           <TextInput
             style={styles.input}
             error={nameError}
@@ -599,7 +395,7 @@ export default function EditProduct({route, navigation}) {
               }}
               onPress={() =>
                 navigation.navigate('ProductImages', {
-                  id: route.params.product_id,
+                  id: route.params.variantId,
                   name: name,
                   images: images,
                 })
@@ -677,7 +473,7 @@ export default function EditProduct({route, navigation}) {
             onChangeText={val => setDescription(val)}
             underlineColor=""
           />
-          <View style={styles.categoryList}>
+          {/* <View style={styles.categoryList}>
             <List.Section
               title={`Category :- ${categoryName}`}
               titleStyle={{color: 'black', fontSize: 17}}>
@@ -714,7 +510,7 @@ export default function EditProduct({route, navigation}) {
                 </RadioButton.Group>
               </List.Accordion>
             </List.Section>
-          </View>
+          </View> */}
 
           <TextInput
             style={styles.input}
@@ -746,7 +542,7 @@ export default function EditProduct({route, navigation}) {
                 <View style={{width: '100%'}} key={index}>
                   <TouchableOpacity
                     onLongPress={() =>
-                      navigation.navigate('EditVariant', {
+                      navigation.push('EditVariant', {
                         variantId: variant._id,
                       })
                     }>

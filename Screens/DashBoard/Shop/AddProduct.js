@@ -18,41 +18,24 @@ import ImagePicker, {
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-const categorys = [
-  {_id: 1, name: 'Wallets'},
-  {_id: 2, name: 'Belts'},
-  {_id: 3, name: 'Watches'},
-  {_id: 4, name: 'Bags'},
-];
-
-const createFormData = photo => {
-  const data = new FormData();
-  data.append('photo', {
-    name: photo.assets[0].fileName,
-    type: photo.assets[0].type,
-    uri:
-      Platform.OS === 'android'
-        ? photo.assets[0].uri
-        : photo.assets[0].uri.replace('file://', ''),
-  });
-  return data;
-};
-
 export default function AddProduct({navigation}) {
+  const [isLoading, setIsLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
 
-  const [ImageData, setImageData] = useState();
+  const [front_image, setFrontImage] = useState();
+  const [back_image, setBackImage] = useState();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [categoryId, setCategoryId] = useState('0');
+  const [categoryId, setCategoryId] = useState('');
   const [categoryName, setCategoryName] = useState('No Category');
 
   const [name, setName] = useState();
   const [nameError, setNameError] = useState();
+
   const [price, setPrice] = useState();
-  const [priceError, setPriceError] = useState();
-  const [sortDetail, setSortDetail] = useState();
-  const [longDetail, setLongDetail] = useState();
+  const [stock, setStock] = useState();
+
+  const [summary, setSummary] = useState();
+  const [description, setDescription] = useState();
 
   const HandleSubmit = () => {
     Alert.alert('Submit Alert', 'Create new Product ?', [
@@ -64,96 +47,105 @@ export default function AddProduct({navigation}) {
   };
 
   async function UploadProduct() {
-    let returnMe = false;
-    if (name == undefined || name == null || name == '') {
+    if (!name) {
       setNameError(true);
-      returnMe = true;
+      return;
     }
-    if (price == undefined || price == null || price == '' || price < 0) {
-      setPriceError(true);
-      returnMe = true;
-    }
-    if (returnMe) return;
 
     try {
       setIsLoading(true);
-      // console.log('After Call', imageName);
+
+      const data = new FormData();
+
+      if (front_image) {
+        data.append('front_image', {
+          name: front_image.assets[0].fileName,
+          type: front_image.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? front_image.assets[0].uri
+              : front_image.assets[0].uri.replace('file://', ''),
+        });
+      }
+      if (back_image) {
+        data.append('back_image', {
+          name: back_image.assets[0].fileName,
+          type: back_image.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? back_image.assets[0].uri
+              : back_image.assets[0].uri.replace('file://', ''),
+        });
+      }
+      if (categoryId) {
+        data.append('category', categoryId);
+      }
+      if (name) {
+        data.append('name', `${name}`);
+      }
+      if (price) {
+        data.append('price', `${price}`);
+      }
+      if (summary) {
+        data.append('summary', summary);
+      }
+      if (description) {
+        data.append('description', description);
+      }
+      if (stock) {
+        data.append('stock', stock);
+      }
+
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
-      const response = await fetch(`${global.server}/admin/createproduct`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${global.token_prefix} ${session.token}`,
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/product`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+          body: data,
         },
-        body: JSON.stringify({
-          name: name,
-          price: price,
-          image: await uploadImage(),
-          sort_detail: sortDetail,
-          long_detail: longDetail,
-          category: categoryId,
-        }),
-      });
+      );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        setName('');
+        setName(null);
         setPrice(0);
-        setImageData('');
-        setSortDetail('');
-        setLongDetail('');
-        setCategoryId('0');
+        setFrontImage(null);
+        setBackImage(null);
+        setSummary(null);
+        setDescription(null);
+        setCategoryId('');
         setCategoryName('No Category');
-        setIsLoading(false);
       } else if (res.status === 'error') {
-        setIsLoading(false);
+        console.log(res);
         alert('Server Error');
       }
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
       alert('Error');
     }
+    setIsLoading(false);
   }
-
-  const uploadImage = async () => {
-    try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(`${global.server}/admin/uploadimage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `${global.token_prefix} ${session.token}`,
-        },
-        body: createFormData(ImageData),
-      });
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        return res.imageName;
-      } else if (res.status === 'error') {
-        alert('Image Error');
-      }
-    } catch (error) {
-      console.log(error);
-      alert('Error');
-    }
-  };
 
   const getAllCategorys = async () => {
     try {
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
-      const response = await fetch(`${global.server}/admin/getallcategorys`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${global.token_prefix} ${session.token}`,
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/category`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
         },
-      });
+      );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         setCategoryList(res.data);
@@ -173,7 +165,7 @@ export default function AddProduct({navigation}) {
     return unsubscribe;
   }, [navigation]);
 
-  const ChooseImage = async () => {
+  const ChooseFrontImage = async () => {
     const result = await launchImageLibrary();
     if (result.didCancel) {
       return;
@@ -181,16 +173,66 @@ export default function AddProduct({navigation}) {
       alert('Problem Picking Image');
       return;
     } else {
-      setImageData(result);
+      setFrontImage(result);
     }
   };
 
-  function RenderImage() {
-    if (ImageData) {
+  const ChooseBackImage = async () => {
+    const result = await launchImageLibrary();
+    if (result.didCancel) {
+      return;
+    } else if (result.error) {
+      alert('Problem Picking Image');
+      return;
+    } else {
+      setBackImage(result);
+    }
+  };
+
+  function RenderFrontImage() {
+    if (front_image) {
       return (
         <Image
           source={{
-            uri: ImageData.assets[0].uri,
+            uri: front_image.assets[0].uri,
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      );
+    } else {
+      return (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            backgroundColor: 'rgb(230, 235, 235)',
+            borderColor: 'lightgray',
+          }}>
+          <Image
+            source={require('../../Assets/uploadImage.png')}
+            style={{
+              width: '40%',
+              height: '40%',
+            }}
+          />
+        </View>
+      );
+    }
+  }
+
+  function RenderBackImage() {
+    if (back_image) {
+      return (
+        <Image
+          source={{
+            uri: back_image.assets[0].uri,
           }}
           style={{
             width: '100%',
@@ -287,14 +329,32 @@ export default function AddProduct({navigation}) {
               marginBottom: 10,
               height: 400,
             }}
-            onPress={() => ChooseImage()}>
+            onPress={() => ChooseFrontImage()}>
             <View
               style={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              {RenderImage()}
+              {RenderFrontImage()}
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              width: 400,
+              marginTop: 10,
+              marginBottom: 10,
+              height: 400,
+            }}
+            onPress={() => ChooseBackImage()}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              {RenderBackImage()}
             </View>
           </TouchableOpacity>
 
@@ -317,9 +377,60 @@ export default function AddProduct({navigation}) {
             }}
             underlineColor=""
           />
+          <View
+            style={{
+              width: '92%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <TextInput
+              style={styles.input}
+              style={{width: '55%'}}
+              autoCapitalize="none"
+              mode="outlined"
+              color="black"
+              selectionColor="black"
+              underlineColor="gray"
+              activeUnderlineColor="black"
+              outlineColor="gray"
+              activeOutlineColor="black"
+              value={price}
+              onChangeText={val => {
+                setPrice(val);
+              }}
+              underlineColor=""
+              type="number"
+              keyboardType={'numeric'}
+              label="Price"
+            />
+            <TextInput
+              style={styles.input}
+              style={{width: '35%'}}
+              autoCapitalize="none"
+              mode="outlined"
+              color="black"
+              selectionColor="black"
+              underlineColor="gray"
+              activeUnderlineColor="black"
+              outlineColor="gray"
+              activeOutlineColor="black"
+              value={stock}
+              onChangeText={val => {
+                setStock(val);
+              }}
+              underlineColor=""
+              type="number"
+              keyboardType={'numeric'}
+              label="Stock"
+            />
+          </View>
+
           <TextInput
             style={styles.input}
-            error={priceError}
+            label="Summary"
+            mode="flat"
+            // multiline={true}
+            // numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
@@ -328,19 +439,13 @@ export default function AddProduct({navigation}) {
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
-            value={price}
-            onChangeText={val => {
-              setPrice(val);
-              setPriceError(false);
-            }}
+            value={summary}
+            onChangeText={val => setSummary(val)}
             underlineColor=""
-            type="number"
-            keyboardType={'numeric'}
-            label="Price"
           />
           <TextInput
             style={styles.input}
-            label="Sort Description"
+            label="Description"
             mode="flat"
             // multiline={true}
             autoCapitalize="none"
@@ -351,24 +456,8 @@ export default function AddProduct({navigation}) {
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
-            value={sortDetail}
-            onChangeText={val => setSortDetail(val)}
-            underlineColor=""
-          />
-          <TextInput
-            style={styles.input}
-            label="Long Description"
-            mode="flat"
-            autoCapitalize="none"
-            mode="outlined"
-            color="black"
-            selectionColor="black"
-            underlineColor="gray"
-            activeUnderlineColor="black"
-            outlineColor="gray"
-            activeOutlineColor="black"
-            value={longDetail}
-            onChangeText={val => setLongDetail(val)}
+            value={description}
+            onChangeText={val => setDescription(val)}
             underlineColor=""
           />
           <View style={styles.categoryList}>
@@ -385,11 +474,11 @@ export default function AddProduct({navigation}) {
                   <View>
                     <RadioButton.Item
                       label="No Category"
-                      value={'0'}
+                      value={''}
                       color="red"
                       onPress={() => {
                         setCategoryName('No Category');
-                        setCategoryId('0');
+                        setCategoryId('');
                       }}
                     />
                     {categoryList.map(data => (

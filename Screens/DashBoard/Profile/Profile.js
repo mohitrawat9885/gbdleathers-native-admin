@@ -1,26 +1,228 @@
 import React, {useState} from 'react';
-import {Text, View, TouchableOpacity, ScrollView, Image} from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const gallery = [
-  {
-    name: 'mo',
-  },
-  {
-    name: 'r',
-  },
-  {
-    name: 'mo',
-  },
-  {
-    name: 'r',
-  },
-];
+import EncryptedStorage from 'react-native-encrypted-storage';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 export default function Profile({navigation}) {
   const [bottomSheet, setBottomSheet] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [backImage, setBackImage] = useState();
+  const [frontImage, setfrontImage] = useState();
+
+  const [shopName, setShopName] = useState();
+
+  const [numbers, setNumbers] = useState([]);
+  const [emails, setEmails] = useState([]);
+  const [address, setAddress] = useState();
+
+  const [galleryImage, setGalleryImage] = useState();
+  const [gallery, setGallery] = useState([]);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getShopProfile();
+      getShopGallary();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  async function getShopProfile() {
+    setIsLoading(true);
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/shop-profile`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      const res = JSON.parse(await response.text());
+      console.log(res);
+      if (res.status === 'success') {
+        console.log(res.data);
+        setShopName(res.data.name);
+        setEmails(res.data.emails);
+        setNumbers(res.data.numbers);
+        setAddress(res.data.address);
+      } else if (res.status === 'error') {
+        alert('Server Error');
+      } else {
+        alert('Unauthorized access');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      alert('Something went wrong');
+    }
+    setIsLoading(false);
+  }
+
+  async function getShopGallary() {
+    setIsLoading(true);
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/shop-profile/gallary`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      const res = JSON.parse(await response.text());
+      // console.log(res);
+      if (res.status === 'success') {
+        setGallery(res.data);
+      } else if (res.status === 'error') {
+        alert('Server Error');
+      } else {
+        alert('Unauthorized access');
+      }
+
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+      alert('Something went wrong');
+    }
+    setIsLoading(false);
+  }
+
+  async function removeGalleryImage(id) {
+    setIsLoading(true);
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/shop-profile/gallary/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      if (response.status === 204) {
+        getShopGallary();
+      } else {
+        const res = JSON.parse(await response.text());
+        if (res.status === 'error') {
+          alert('Server Error');
+        } else {
+          alert('Unauthorized access');
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      alert('Something went wrong');
+    }
+    setIsLoading(false);
+  }
+
+  async function uploadShopGallary() {
+    setIsLoading(true);
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const data = new FormData();
+      if (galleryImage) {
+        data.append('photo', {
+          name: galleryImage.assets[0].fileName,
+          type: galleryImage.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? galleryImage.assets[0].uri
+              : galleryImage.assets[0].uri.replace('file://', ''),
+        });
+      }
+      // console.log(data);
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/shop-profile/gallary`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+          body: data,
+        },
+      );
+      const res = JSON.parse(await response.text());
+      console.log(res);
+      if (res.status === 'success') {
+        setBottomSheet(false);
+        getShopGallary();
+      } else if (res.status === 'error') {
+        alert('Server Error');
+      } else {
+        alert('Unauthorized access');
+      }
+    } catch (error) {
+      console.log(error);
+      alert('Error');
+    }
+    setIsLoading(false);
+  }
+
+  const chooseGalleryImage = () => {
+    launchImageLibrary({}, response => {
+      if (response.didCancel) {
+      } else if (response.error) {
+        // console.log(response.error);
+        alert('Storage Error: ');
+      } else {
+        setGalleryImage(response);
+        setBottomSheet(true);
+      }
+    });
+  };
+
+  function LoadingPage() {
+    if (isLoading) {
+      return (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, .8)',
+            zIndex: 100,
+            position: 'absolute',
+          }}>
+          <ActivityIndicator size={45} color="black" />
+        </View>
+      );
+    } else {
+      return <></>;
+    }
+  }
+
   return (
     <>
       <Header
@@ -49,7 +251,7 @@ export default function Profile({navigation}) {
                 color="gray"
               />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => chooseGalleryImage()}>
               <Avatar.Icon
                 style={{backgroundColor: 'white'}}
                 size={38}
@@ -65,6 +267,7 @@ export default function Profile({navigation}) {
           alignItems: 'center',
         }}
       />
+      <LoadingPage />
       <ScrollView
         contentContainerStyle={{
           alignItems: 'center',
@@ -111,44 +314,48 @@ export default function Profile({navigation}) {
             style={{
               marginTop: 20,
               marginBottom: 20,
-              fontSize: 22,
+              fontSize: 23,
               textAlign: 'center',
             }}>
-            Mohit
+            {shopName}
           </Text>
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            // justifyContent: 'center',
-            alignItems: 'center',
-            width: 300,
-          }}>
-          <Avatar.Icon
-            style={{backgroundColor: 'white'}}
-            size={38}
-            icon="phone"
-            color="blue"
-          />
-          <Text style={{fontSize: 16}}>+91-7895995686</Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            // justifyContent: 'center',
-            alignItems: 'center',
-            width: 300,
-          }}>
-          <Avatar.Icon
-            style={{backgroundColor: 'white'}}
-            size={38}
-            icon="email"
-            color="blue"
-          />
-          <Text style={{fontSize: 16}}>mohitrawat9885@gmail.com</Text>
-        </View>
+        {numbers.map((num, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 300,
+            }}>
+            <Avatar.Icon
+              style={{backgroundColor: 'white'}}
+              size={38}
+              icon="phone"
+              color="blue"
+            />
+            <Text style={{fontSize: 16}}>{num}</Text>
+          </View>
+        ))}
+        {emails.map((email, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 300,
+            }}>
+            <Avatar.Icon
+              style={{backgroundColor: 'white'}}
+              size={38}
+              icon="email"
+              color="blue"
+            />
+            <Text style={{fontSize: 16}}>{email}</Text>
+          </View>
+        ))}
 
         <View
           style={{
@@ -163,9 +370,7 @@ export default function Profile({navigation}) {
             icon="map-marker-radius"
             color="blue"
           />
-          <Text style={{fontSize: 16, textAlign: 'center'}}>
-            Himalayan Coloney, Najibabad, UttarPradesh, 276346, Near dairy
-          </Text>
+          <Text style={{fontSize: 16, textAlign: 'center'}}>{address}</Text>
         </View>
 
         <View
@@ -189,7 +394,8 @@ export default function Profile({navigation}) {
                 width: 190,
                 height: 140,
                 marginBottom: 4,
-              }}>
+              }}
+              onLongPress={() => removeGalleryImage(val._id)}>
               <Image
                 source={{
                   uri: `https://diyprojects.com/wp-content/uploads/2020/12/man-working-leather-using-crafting-diy-leather-craft-SS-Featured-1.jpg`,
@@ -215,14 +421,14 @@ export default function Profile({navigation}) {
               onPress: () => setBottomSheet(false),
             }}
             centerComponent={{
-              text: 'Add to Restaurant Gallery',
+              text: 'Add to Shop Gallery',
               style: {color: 'black', fontSize: 22, justifyContent: 'center'},
             }}
             rightComponent={{
               icon: 'check',
               color: 'black',
               size: 28,
-              // onPress: () => uploadGalleryImage(),
+              onPress: () => uploadShopGallary(),
             }}
             containerStyle={{
               backgroundColor: 'white',
@@ -239,12 +445,12 @@ export default function Profile({navigation}) {
               height: 350,
               backgroundColor: 'rgb(240, 240, 240)',
             }}>
-            {/* <Image
+            <Image
               source={{
-                uri: galleryImage.uri,
+                uri: galleryImage ? galleryImage.assets[0].uri : '',
               }}
               style={{width: 380, height: 200, marginTop: 20}}
-            /> */}
+            />
           </View>
         </BottomSheet>
       </ScrollView>

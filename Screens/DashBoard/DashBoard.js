@@ -20,6 +20,10 @@ import AddCategory from './Shop/AddCategory';
 import EditProduct from './Shop/EditProduct';
 import EditCategory from './Shop/EditCategory';
 
+import EditProfile from './Profile/EditProfile';
+import ProductImages from './Shop/ProductImages';
+import EditVariant from './Shop/EditVariant';
+
 const Tab = createBottomTabNavigator();
 function DashHomeTab({route, navigation}) {
   return (
@@ -138,6 +142,29 @@ export default function Dashboard({navigation}) {
         <Stack.Screen
           name="EditCategory"
           component={EditCategory}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ProductImages"
+          component={ProductImages}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="EditVariant"
+          component={EditVariant}
           options={{
             headerShown: false,
           }}
