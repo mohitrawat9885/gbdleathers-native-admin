@@ -25,11 +25,12 @@ export default function Workshop({navigation}) {
         rightComponent={
           <View style={{flex: 1, flexDirection: 'row'}}>
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('EditProfile', {
-                  profile: profile,
-                })
-              }>
+            // onPress={() =>
+            //   navigation.navigate('EditProfile', {
+            //     profile: profile,
+            //   })
+            // }
+            >
               <Avatar.Icon
                 style={{backgroundColor: 'white'}}
                 size={38}
@@ -37,7 +38,9 @@ export default function Workshop({navigation}) {
                 color="gray"
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => chooseGalleryImage()}>
+            <TouchableOpacity
+            // onPress={() => chooseGalleryImage()}
+            >
               <Avatar.Icon
                 style={{backgroundColor: 'white'}}
                 size={38}
@@ -53,7 +56,7 @@ export default function Workshop({navigation}) {
           alignItems: 'center',
         }}
       />
-      <Text>Workshop Screen</Text>
+      {/* <Text>Workshop Screen</Text> */}
     </>
   );
 }

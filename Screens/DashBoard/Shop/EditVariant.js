@@ -28,13 +28,21 @@ import ImagePicker, {
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default function EditVariant({route, navigation}) {
-  const [bottomSheet, setBottomSheet] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
-  const [isBottomLoading, setIsBottomLoading] = useState(false);
+  // const [isBottomLoading, setIsBottomLoading] = useState(false);
+  // const [categoryList, setCategoryList] = useState([]);
+
+  const [front_image, setFrontImage] = useState();
+  const [back_image, setBackImage] = useState();
+
+  const [frontImageName, setFrontImageName] = useState();
+  const [backImageName, setBackImageName] = useState();
+
+  // const [categoryId, setCategoryId] = useState('');
+  // const [categoryName, setCategoryName] = useState('No Category');
 
   const [name, setName] = useState();
-  const [nameError, setNameError] = useState();
+  // const [nameError, setNameError] = useState();
 
   const [price, setPrice] = useState();
   const [stock, setStock] = useState();
@@ -47,21 +55,13 @@ export default function EditVariant({route, navigation}) {
   const [summary, setSummary] = useState();
   const [description, setDescription] = useState();
 
-  const [variants, setVariants] = useState([]);
+  // const [variants, setVariants] = useState([]);
 
-  const [variationName, setVariationName] = useState();
-
-  const [variantName, setVariantName] = useState();
-  const [variantNameError, setVariantNameError] = useState();
-
-  const [variantPrice, setVariantPrice] = useState();
-  const [variantStock, setVariantStock] = useState();
-
-  const [variantSummary, setVariantSummary] = useState();
-  const [variantDescription, setVariantDescription] = useState();
+  const [multi_properties, setMultiProperties] = useState([]);
+  const [properties, setProperties] = useState([]);
 
   const HandleSubmit = () => {
-    Alert.alert('Submit Alert', 'Update Variant ?', [
+    Alert.alert('Submit Alert', 'Update Product ?', [
       {
         text: 'Cancel',
       },
@@ -69,73 +69,37 @@ export default function EditVariant({route, navigation}) {
     ]);
   };
 
-  async function addProductVariant() {
-    if (!variantName) {
-      setVariantNameError(true);
-      return;
-    }
-
-    try {
-      setIsBottomLoading(true);
-      const data = new FormData();
-      if (variantName) {
-        data.append('name', `${variantName}`);
-      }
-      if (variantPrice) {
-        data.append('price', `${variantPrice}`);
-      }
-      if (variantSummary) {
-        data.append('summary', variantSummary);
-      }
-      if (variantDescription) {
-        data.append('description', variantDescription);
-      }
-      if (variantStock) {
-        data.append('stock', variantStock);
-      }
-
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `${global.token_prefix} ${session.token}`,
-          },
-          body: data,
-        },
-      );
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        setBottomSheet(false);
-        setVariantName(null);
-        setVariantPrice(null);
-        setVariantStock(null);
-        setVariantSummary(null);
-        setVariantDescription(null);
-        getProduct();
-      } else if (res.status === 'error') {
-        alert('Server Error');
-      }
-    } catch (error) {
-      alert('Error');
-    }
-    setIsBottomLoading(false);
-  }
-
   async function UploadProduct() {
-    if (!name) {
-      setNameError(true);
-      return;
-    }
+    // if (!name) {
+    //   setNameError(true);
+    //   return;
+    // }
 
     try {
       setIsLoading(true);
 
       const data = new FormData();
+
+      if (front_image) {
+        data.append('front_image', {
+          name: front_image.assets[0].fileName,
+          type: front_image.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? front_image.assets[0].uri
+              : front_image.assets[0].uri.replace('file://', ''),
+        });
+      }
+      if (back_image) {
+        data.append('back_image', {
+          name: back_image.assets[0].fileName,
+          type: back_image.assets[0].type,
+          uri:
+            Platform.OS === 'android'
+              ? back_image.assets[0].uri
+              : back_image.assets[0].uri.replace('file://', ''),
+        });
+      }
 
       if (name) {
         data.append('name', `${name}`);
@@ -155,14 +119,28 @@ export default function EditVariant({route, navigation}) {
       if (active) {
         data.append('active', active);
       }
-      if (variationName) {
-        data.append('variant_name', variationName);
+      if (multi_properties.length > 0) {
+        let newMultiProperties = {};
+        for (let i in multi_properties) {
+          newMultiProperties[multi_properties[i].name] =
+            multi_properties[i].value;
+        }
+
+        data.append('multi_properties', JSON.stringify(newMultiProperties));
+      }
+
+      if (properties.length > 0) {
+        let newProperties = {};
+        for (let i in properties) {
+          newProperties[properties[i].name] = properties[i].value;
+        }
+        data.append('properties', JSON.stringify(newProperties));
       }
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variant_id}`,
         {
           method: 'PATCH',
           headers: {
@@ -179,8 +157,8 @@ export default function EditVariant({route, navigation}) {
         alert('Server Error');
       }
     } catch (error) {
-      // console.log(error);
-      alert('Error');
+      console.log(error);
+      alert('Please try again!');
     }
     setIsLoading(false);
   }
@@ -192,7 +170,7 @@ export default function EditVariant({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variantId}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variant_id}`,
         {
           method: 'GET',
           headers: {
@@ -203,6 +181,10 @@ export default function EditVariant({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
+        // setCategoryId(res.data.category._id);
+        // setCategoryName(res.data.category.name);
+        setFrontImageName(res.data.front_image);
+        setBackImageName(res.data.back_image);
         setName(res.data.name);
         setPrice(isNaN(res.data.price) ? null : `${res.data.price}`);
         setStock(isNaN(res.data.stock) ? null : `${res.data.stock}`);
@@ -210,24 +192,169 @@ export default function EditVariant({route, navigation}) {
         setActive(res.data.active);
         setSummary(res.data.summary);
         setDescription(res.data.description);
-        setVariationName(res.data.variant_name);
-        setVariants(res.data.variants);
+        // setVariationName(res.data.variant_name);
+        // setVariants(res.data.variants);
+
+        // console.log('Multi Properties', res.data.multi_properties);
+        if (res.data.multi_properties) {
+          let mp_arr = [];
+          for (let i in res.data.multi_properties) {
+            let obj = {
+              name: i,
+              value: res.data.multi_properties[i],
+            };
+            mp_arr.push(obj);
+          }
+          setMultiProperties(mp_arr);
+        }
       } else {
-        alert('Something went wrong!');
+        alert('Something went wrong!', res.message);
       }
     } catch (error) {
+      console.log(error);
       alert('Something went wrong!');
     }
     setIsLoading(false);
   };
 
+  // const getAllCategorys = async () => {
+  //   try {
+  //     const session = JSON.parse(
+  //       await EncryptedStorage.getItem('user_session'),
+  //     );
+  //     const response = await fetch(
+  //       `${global.server}/api/v1/gbdleathers/shop/category`,
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `${global.token_prefix} ${session.token}`,
+  //         },
+  //       },
+  //     );
+  //     const res = JSON.parse(await response.text());
+  //     if (res.status === 'success') {
+  //       setCategoryList(res.data);
+  //     } else {
+  //       setCategoryList([]);
+  //     }
+  //   } catch (error) {
+  //     setCategoryList([]);
+  //   }
+  // };
+
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      // getAllCategorys();
       getProduct();
+      // getCategoryProductList();
     });
     return unsubscribe;
   }, [navigation]);
 
+  const ChooseFrontImage = async () => {
+    const result = await launchImageLibrary();
+    if (result.didCancel) {
+      return;
+    } else if (result.error) {
+      alert('Problem Picking Image');
+      return;
+    } else {
+      setFrontImage(result);
+    }
+  };
+
+  const ChooseBackImage = async () => {
+    const result = await launchImageLibrary();
+    if (result.didCancel) {
+      return;
+    } else if (result.error) {
+      alert('Problem Picking Image');
+      return;
+    } else {
+      setBackImage(result);
+    }
+  };
+
+  function RenderFrontImage() {
+    if (front_image) {
+      return (
+        <Image
+          source={{
+            uri: front_image.assets[0].uri,
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      );
+    } else {
+      return (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            backgroundColor: 'rgb(230, 235, 235)',
+            borderColor: 'lightgray',
+          }}>
+          <Image
+            source={{
+              uri: `${global.server}/images/${frontImageName}`,
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          />
+        </View>
+      );
+    }
+  }
+
+  function RenderBackImage() {
+    if (back_image) {
+      return (
+        <Image
+          source={{
+            uri: back_image.assets[0].uri,
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      );
+    } else {
+      return (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            backgroundColor: 'rgb(230, 235, 235)',
+            borderColor: 'lightgray',
+          }}>
+          <Image
+            source={{
+              uri: `${global.server}/images/${backImageName}`,
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          />
+        </View>
+      );
+    }
+  }
   function LoadingPage() {
     if (isLoading) {
       return (
@@ -249,27 +376,27 @@ export default function EditVariant({route, navigation}) {
       return <></>;
     }
   }
-  function LoadingBottomPage() {
-    if (isBottomLoading) {
-      return (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(255, 255, 255, .8)',
-            zIndex: 100,
-            position: 'absolute',
-          }}>
-          <ActivityIndicator size={45} color="black" />
-        </View>
-      );
-    } else {
-      return <></>;
-    }
-  }
+  // function LoadingBottomPage() {
+  //   if (isBottomLoading) {
+  //     return (
+  //       <View
+  //         style={{
+  //           width: '100%',
+  //           height: '100%',
+  //           display: 'flex',
+  //           justifyContent: 'center',
+  //           alignItems: 'center',
+  //           backgroundColor: 'rgba(255, 255, 255, .8)',
+  //           zIndex: 100,
+  //           position: 'absolute',
+  //         }}>
+  //         <ActivityIndicator size={45} color="black" />
+  //       </View>
+  //     );
+  //   } else {
+  //     return <></>;
+  //   }
+  // }
 
   return (
     <>
@@ -284,7 +411,7 @@ export default function EditVariant({route, navigation}) {
           onPress: () => navigation.goBack(),
         }}
         centerComponent={{
-          text: 'Update Variant',
+          text: 'Update Product',
           style: {color: 'black', fontSize: 22, justifyContent: 'center'},
         }}
         rightComponent={
@@ -308,9 +435,45 @@ export default function EditVariant({route, navigation}) {
       <LoadingPage />
       <ScrollView>
         <View style={styles.container}>
+          <TouchableOpacity
+            style={{
+              width: 400,
+              marginTop: 10,
+              marginBottom: 10,
+              height: 400,
+            }}
+            onPress={() => ChooseFrontImage()}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              {RenderFrontImage()}
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              width: 400,
+              marginTop: 10,
+              marginBottom: 10,
+              height: 400,
+            }}
+            onPress={() => ChooseBackImage()}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              {RenderBackImage()}
+            </View>
+          </TouchableOpacity>
+
           <TextInput
             style={styles.input}
-            error={nameError}
+            // error={nameError}
             label="Product Name"
             autoCapitalize="none"
             mode="outlined"
@@ -323,7 +486,6 @@ export default function EditVariant({route, navigation}) {
             value={name}
             onChangeText={val => {
               setName(val);
-              setNameError(false);
             }}
             underlineColor=""
           />
@@ -395,7 +557,7 @@ export default function EditVariant({route, navigation}) {
               }}
               onPress={() =>
                 navigation.navigate('ProductImages', {
-                  id: route.params.variantId,
+                  id: route.params.variant_id,
                   name: name,
                   images: images,
                 })
@@ -415,10 +577,6 @@ export default function EditVariant({route, navigation}) {
             <View
               style={{
                 width: '40%',
-                // marginRight: 30,
-
-                // paddingTop: 20,
-                // paddingBottom: 20,
                 paddingRight: 10,
                 display: 'flex',
                 flexDirection: 'row',
@@ -442,8 +600,8 @@ export default function EditVariant({route, navigation}) {
             style={styles.input}
             label="Summary"
             mode="flat"
-            // multiline={true}
-            // numberOfLines={10}
+            multiline={true}
+            numberOfLines={7}
             autoCapitalize="none"
             mode="outlined"
             color="black"
@@ -460,7 +618,8 @@ export default function EditVariant({route, navigation}) {
             style={styles.input}
             label="Description"
             mode="flat"
-            // multiline={true}
+            multiline={true}
+            numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
@@ -473,271 +632,350 @@ export default function EditVariant({route, navigation}) {
             onChangeText={val => setDescription(val)}
             underlineColor=""
           />
-          {/* <View style={styles.categoryList}>
-            <List.Section
-              title={`Category :- ${categoryName}`}
-              titleStyle={{color: 'black', fontSize: 17}}>
-              <List.Accordion
-                titleStyle={{color: 'black', fontSize: 18}}
-                title="Select Category"
-                left={props => (
-                  <List.Icon {...props} color="black" icon="view-list" />
-                )}>
-                <RadioButton.Group value={categoryId}>
-                  <View>
-                    <RadioButton.Item
-                      label="No Category"
-                      value={''}
-                      color="red"
-                      onPress={() => {
-                        setCategoryName('No Category');
-                        setCategoryId('');
-                      }}
-                    />
-                    {categoryList.map(data => (
-                      <RadioButton.Item
-                        key={data.name}
-                        label={data.name}
-                        value={data._id}
-                        color="green"
-                        onPress={() => {
-                          setCategoryId(data._id);
-                          setCategoryName(data.name);
-                        }}
-                      />
-                    ))}
-                  </View>
-                </RadioButton.Group>
-              </List.Accordion>
-            </List.Section>
-          </View> */}
-
-          <TextInput
-            style={styles.input}
-            label="Variation Type"
-            mode="flat"
-            // multiline={true}
-            autoCapitalize="none"
-            mode="outlined"
-            color="black"
-            selectionColor="black"
-            underlineColor="gray"
-            activeUnderlineColor="black"
-            outlineColor="gray"
-            activeOutlineColor="black"
-            value={variationName}
-            onChangeText={val => setVariationName(val)}
-            underlineColor=""
-          />
           <View
             style={{
               width: '92%',
+              marginBottom: 30,
             }}>
             <List.Accordion
               titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
-              title={variationName}
+              title="Properties"
               // id="1"
               style={{backgroundColor: 'white'}}>
-              {variants.map((variant, index) => (
-                <View style={{width: '100%'}} key={index}>
-                  <TouchableOpacity
-                    onLongPress={() =>
-                      navigation.push('EditVariant', {
-                        variantId: variant._id,
-                      })
-                    }>
-                    <View style={styles.productStyle}>
-                      <Image
-                        source={{
-                          uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
-                        }}
-                        style={styles.productImage}
-                      />
-                      <View style={styles.productDetailStyle}>
-                        <Text style={{fontSize: 18, marginLeft: 16}}>
-                          {variant.name}
-                        </Text>
-                        <View style={{right: 10}}>
-                          <Text style={{fontSize: 18}}>
-                            Stock .{variant.stock}
-                          </Text>
+              {multi_properties.map((propertie, index) => (
+                <View
+                  key={index}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: 8,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    paddingBottom: 8,
+                  }}>
+                  <View
+                    style={{
+                      width: '90%',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    <TextInput
+                      style={{
+                        width: '70%',
+                        marginTop: 10,
+                      }}
+                      label="Propertie Name"
+                      mode="flat"
+                      autoCapitalize="none"
+                      mode="outlined"
+                      color="black"
+                      selectionColor="black"
+                      underlineColor="gray"
+                      activeUnderlineColor="black"
+                      outlineColor="gray"
+                      activeOutlineColor="black"
+                      value={propertie.name}
+                      underlineColor=""
+                      onChangeText={val => {
+                        let newPro = [];
+                        multi_properties[index].name = val;
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          newPro[i] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                    <IconButton
+                      icon="delete-circle"
+                      color={Colors.red600}
+                      size={32}
+                      onPress={() => {
+                        let newPro = [];
+                        let indi = 0;
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          if (i === index) continue;
+                          newPro[indi++] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                    <IconButton
+                      icon="plus-circle"
+                      color={Colors.blue500}
+                      size={32}
+                      onPress={() => {
+                        let newPro = [];
+                        multi_properties[index].value.push('');
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          newPro[i] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      width: '92%',
+                    }}>
+                    <List.Accordion
+                      titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
+                      title="Values"
+                      // id="1"
+                      style={{backgroundColor: 'white'}}>
+                      {propertie.value.map((v, i) => (
+                        <View
+                          key={i}
+                          style={{
+                            width: '90%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                          }}>
+                          <IconButton
+                            icon="delete"
+                            color={Colors.red400}
+                            size={28}
+                            onPress={() => {
+                              let newValue = [];
+                              let indi = 0;
+                              for (
+                                let j = 0;
+                                j < multi_properties[index].value.length;
+                                j++
+                              ) {
+                                if (j === i) continue;
+                                newValue[indi++] =
+                                  multi_properties[index].value[j];
+                              }
+                              let newPro = [];
+                              multi_properties[index].value = newValue;
+                              for (
+                                let k = 0;
+                                k < multi_properties.length;
+                                k++
+                              ) {
+                                newPro[k] = multi_properties[k];
+                              }
+                              setMultiProperties(newPro);
+                            }}
+                          />
+                          <TextInput
+                            style={{
+                              width: '70%',
+                            }}
+                            label="Propertie Value"
+                            mode="flat"
+                            // multiline={true}
+                            autoCapitalize="none"
+                            mode="outlined"
+                            color="black"
+                            selectionColor="black"
+                            underlineColor="gray"
+                            activeUnderlineColor="black"
+                            outlineColor="gray"
+                            activeOutlineColor="black"
+                            value={String(v)}
+                            underlineColor=""
+                            onChangeText={val => {
+                              let newValue = [];
+                              // propertie.value[i] = val;
+                              multi_properties[index].value[i] = val;
+                              for (let j = 0; j < propertie.value.length; j++) {
+                                newValue[j] = multi_properties[index].value[j];
+                              }
+                              let newPro = [];
+                              multi_properties[index].value = newValue;
+                              for (
+                                let k = 0;
+                                k < multi_properties.length;
+                                k++
+                              ) {
+                                newPro[k] = multi_properties[k];
+                              }
+                              setMultiProperties(newPro);
+                            }}
+                          />
                         </View>
-                        <View style={{right: 10}}>
-                          <Text style={{fontSize: 18}}>
-                            QTR .{variant.price}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                      ))}
+                    </List.Accordion>
+                  </View>
                 </View>
               ))}
+
+              <Button
+                style={{
+                  width: '100%',
+                  height: 43,
+                  // margin: 10,
+                  marginTop: 5,
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  justifyContent: 'center',
+                  // backgroundColor: '',
+                  // height: 50,
+                  // fontSize: 18,
+                }}
+                icon="plus"
+                mode="outlined"
+                color="black"
+                onPress={() => {
+                  let newPro = [];
+                  for (let i = 0; i < multi_properties.length; i++) {
+                    newPro[i] = multi_properties[i];
+                  }
+                  newPro.push({name: '', value: []});
+                  setMultiProperties(newPro);
+                }}>
+                Add New Propertie
+              </Button>
             </List.Accordion>
           </View>
 
-          <Button
-            style={{
-              width: '92%',
-              height: 43,
-              // margin: 10,
-              marginTop: 20,
-              borderWidth: 1,
-              borderColor: 'gray',
-              justifyContent: 'center',
-
-              // backgroundColor: '',
-              // height: 50,
-              // fontSize: 18,
-            }}
-            icon="book-open-page-variant"
-            mode="outlined"
-            color="black"
-            onPress={() => setBottomSheet(true)}>
-            Create Variant
-          </Button>
-        </View>
-        <View style={styles.bottomSpace}></View>
-
-        <BottomSheet isVisible={bottomSheet}>
-          <Header
-            backgroundColor="lightgray"
-            barStyle="dark-content"
-            placement="left"
-            leftComponent={{
-              icon: 'close',
-              color: 'black',
-              size: 28,
-              onPress: () => setBottomSheet(false),
-            }}
-            centerComponent={{
-              text: 'Add Variant',
-              style: {color: 'black', fontSize: 22, justifyContent: 'center'},
-            }}
-            rightComponent={{
-              icon: 'check',
-              color: 'black',
-              size: 28,
-              onPress: () => addProductVariant(),
-            }}
-            containerStyle={{
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          />
-          <LoadingBottomPage />
           <View
             style={{
-              width: '100%',
-              flex: 1,
-              // justifyContent: 'center',
-              alignItems: 'center',
-              height: 350,
-              backgroundColor: 'rgb(240, 240, 240)',
+              width: '92%',
+              marginBottom: 30,
             }}>
-            <TextInput
-              style={styles.input}
-              error={variantNameError}
-              label="Variant Name"
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantName}
-              onChangeText={val => {
-                setVariantName(val);
-                setVariantNameError(false);
-              }}
-              underlineColor=""
-            />
-            <View
-              style={{
-                width: '92%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <TextInput
-                style={styles.input}
-                style={{width: '55%'}}
-                autoCapitalize="none"
-                mode="outlined"
-                color="black"
-                selectionColor="black"
-                underlineColor="gray"
-                activeUnderlineColor="black"
-                outlineColor="gray"
-                activeOutlineColor="black"
-                value={variantPrice}
-                onChangeText={val => {
-                  setVariantPrice(val);
-                }}
-                underlineColor=""
-                type="number"
-                keyboardType={'numeric'}
-                label="Variant Price"
-              />
-              <TextInput
-                style={styles.input}
-                style={{width: '35%'}}
-                autoCapitalize="none"
-                mode="outlined"
-                color="black"
-                selectionColor="black"
-                underlineColor="gray"
-                activeUnderlineColor="black"
-                outlineColor="gray"
-                activeOutlineColor="black"
-                value={variantStock}
-                onChangeText={val => {
-                  setVariantStock(val);
-                }}
-                underlineColor=""
-                type="number"
-                keyboardType={'numeric'}
-                label="Variant Stock"
-              />
-            </View>
+            <List.Accordion
+              titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
+              title="Variant Properties"
+              // id="1"
+              style={{backgroundColor: 'white'}}>
+              {properties.map((propertie, index) => (
+                <View
+                  key={index}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: 8,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    paddingBottom: 8,
+                  }}>
+                  <View
+                    style={{
+                      width: '90%',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    <TextInput
+                      style={{
+                        width: '70%',
+                        marginTop: 10,
+                      }}
+                      label="Propertie Name"
+                      mode="flat"
+                      autoCapitalize="none"
+                      mode="outlined"
+                      color="black"
+                      selectionColor="black"
+                      underlineColor="gray"
+                      activeUnderlineColor="black"
+                      outlineColor="gray"
+                      activeOutlineColor="black"
+                      value={propertie.name}
+                      underlineColor=""
+                      onChangeText={val => {
+                        let newPro = [];
+                        properties[index].name = val;
+                        for (let i = 0; i < properties.length; i++) {
+                          newPro[i] = properties[i];
+                        }
+                        setProperties(newPro);
+                      }}
+                    />
+                    <IconButton
+                      icon="delete-circle"
+                      color={Colors.red600}
+                      size={32}
+                      onPress={() => {
+                        let newPro = [];
+                        let indi = 0;
+                        for (let i = 0; i < properties.length; i++) {
+                          if (i === index) continue;
+                          newPro[indi++] = properties[i];
+                        }
+                        setProperties(newPro);
+                      }}
+                    />
+                  </View>
 
-            <TextInput
-              style={styles.input}
-              label="Variant Summary"
-              mode="flat"
-              // multiline={true}
-              // numberOfLines={10}
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantSummary}
-              onChangeText={val => setVariantSummary(val)}
-              underlineColor=""
-            />
-            <TextInput
-              style={styles.input}
-              label="Variant Description"
-              mode="flat"
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantDescription}
-              onChangeText={val => setVariantDescription(val)}
-              underlineColor=""
-            />
+                  <View
+                    style={{
+                      width: '90%',
+                      display: 'flex',
+                      flexDirection: 'row-reverse',
+                      justifyContent: 'space-between',
+                    }}>
+                    <TextInput
+                      style={{
+                        width: '70%',
+                      }}
+                      label="Propertie Value"
+                      mode="flat"
+                      // multiline={true}
+                      autoCapitalize="none"
+                      mode="outlined"
+                      color="black"
+                      selectionColor="black"
+                      underlineColor="gray"
+                      activeUnderlineColor="black"
+                      outlineColor="gray"
+                      activeOutlineColor="black"
+                      value={String(propertie.value)}
+                      underlineColor=""
+                      onChangeText={val => {
+                        let newPro = [];
+                        properties[index].value = val;
+                        for (let i = 0; i < properties.length; i++) {
+                          newPro[i] = properties[i];
+                        }
+                        setProperties(newPro);
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
+
+              <Button
+                style={{
+                  width: '100%',
+                  height: 43,
+                  // margin: 10,
+                  marginTop: 5,
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  justifyContent: 'center',
+                  // backgroundColor: '',
+                  // height: 50,
+                  // fontSize: 18,
+                }}
+                icon="plus"
+                mode="outlined"
+                color="black"
+                onPress={() => {
+                  let newPro = [];
+                  for (let i = 0; i < properties.length; i++) {
+                    newPro[i] = properties[i];
+                  }
+                  newPro.push({name: '', value: ''});
+                  setProperties(newPro);
+                }}>
+                Add Variant Propertie
+              </Button>
+            </List.Accordion>
           </View>
-        </BottomSheet>
+        </View>
+        <View style={styles.bottomSpace}></View>
       </ScrollView>
     </>
   );
@@ -753,7 +991,7 @@ const styles = StyleSheet.create({
     width: '96%',
     padding: 8,
     marginTop: 5,
-    height: 50,
+    // height: 50,
     fontSize: 16,
     fontWeight: '500',
   },

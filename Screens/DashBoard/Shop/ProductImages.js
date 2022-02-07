@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -33,15 +33,29 @@ export default function ProductImages({route, navigation}) {
   const [uploadImage, setUploadImage] = useState();
   const [images, setImages] = useState(route.params.images);
 
+  const HandleSubmit = val => {
+    Alert.alert('Submit Alert', 'Remove Image ?', [
+      {
+        text: 'Cancel',
+      },
+      {text: 'OK', onPress: () => removeProductImage(val)},
+    ]);
+  };
+
+  useEffect(() => {
+    if (uploadImage) {
+      setTimeout(() => {}, 500);
+      setBottomSheet(true);
+    }
+  }, [uploadImage]);
+
   const chooseProductImage = () => {
     launchImageLibrary({}, response => {
       if (response.didCancel) {
       } else if (response.error) {
-        // console.log(response.error);
         alert('Storage Error: ');
       } else {
         setUploadImage(response);
-        setBottomSheet(true);
       }
     });
   };
@@ -79,9 +93,6 @@ export default function ProductImages({route, navigation}) {
   async function uploadProductImage() {
     setIsLoading(true);
     try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
       const data = new FormData();
       if (uploadImage) {
         data.append('images', {
@@ -93,6 +104,9 @@ export default function ProductImages({route, navigation}) {
               : uploadImage.assets[0].uri.replace('file://', ''),
         });
       }
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
       // console.log(data);
       const response = await fetch(
         `${global.server}/api/v1/gbdleathers/shop/product/${route.params.id}/images`,
@@ -117,7 +131,7 @@ export default function ProductImages({route, navigation}) {
       }
     } catch (error) {
       console.log(error);
-      alert('Error');
+      alert('Please Try again!');
     }
     setIsLoading(false);
   }
@@ -201,10 +215,10 @@ export default function ProductImages({route, navigation}) {
                 height: 140,
                 marginBottom: 4,
               }}
-              onLongPress={() => removeProductImage(val)}>
+              onLongPress={() => HandleSubmit(val)}>
               <Image
                 source={{
-                  uri: `https://diyprojects.com/wp-content/uploads/2020/12/man-working-leather-using-crafting-diy-leather-craft-SS-Featured-1.jpg`,
+                  uri: `${global.server}/images/${val}`,
                 }}
                 style={{
                   width: 190,

@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, LogBox} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -10,7 +10,11 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
+
+LogBox.ignoreLogs(['Reanimated 2']);
+
 global.server = 'http://192.168.43.14:8000';
+
 global.token_prefix = 'Bearer';
 const Stack = createNativeStackNavigator();
 export default function App() {

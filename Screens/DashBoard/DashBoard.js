@@ -22,6 +22,7 @@ import EditCategory from './Shop/EditCategory';
 
 import EditProfile from './Profile/EditProfile';
 import ProductImages from './Shop/ProductImages';
+import AddVariant from './Shop/AddVariant';
 import EditVariant from './Shop/EditVariant';
 
 const Tab = createBottomTabNavigator();
@@ -162,6 +163,13 @@ export default function Dashboard({navigation}) {
           }}
         />
 
+        <Stack.Screen
+          name="AddVariant"
+          component={AddVariant}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="EditVariant"
           component={EditVariant}

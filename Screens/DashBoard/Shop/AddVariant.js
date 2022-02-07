@@ -18,18 +18,13 @@ import ImagePicker, {
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-export default function AddProduct({navigation}) {
+export default function AddVariant({route, navigation}) {
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([]);
 
   const [front_image, setFrontImage] = useState();
   const [back_image, setBackImage] = useState();
 
-  const [categoryId, setCategoryId] = useState('');
-  const [categoryName, setCategoryName] = useState('No Category');
-
   const [name, setName] = useState();
-  const [nameError, setNameError] = useState();
 
   const [price, setPrice] = useState();
   const [stock, setStock] = useState();
@@ -38,7 +33,7 @@ export default function AddProduct({navigation}) {
   const [description, setDescription] = useState();
 
   const HandleSubmit = () => {
-    Alert.alert('Submit Alert', 'Create new Product ?', [
+    Alert.alert('Submit Alert', 'Create new Variant ?', [
       {
         text: 'Cancel',
       },
@@ -47,11 +42,6 @@ export default function AddProduct({navigation}) {
   };
 
   async function UploadProduct() {
-    if (!name) {
-      setNameError(true);
-      return;
-    }
-
     try {
       setIsLoading(true);
 
@@ -77,9 +67,7 @@ export default function AddProduct({navigation}) {
               : back_image.assets[0].uri.replace('file://', ''),
         });
       }
-      if (categoryId) {
-        data.append('category', categoryId);
-      }
+
       if (name) {
         data.append('name', `${name}`);
       }
@@ -93,14 +81,14 @@ export default function AddProduct({navigation}) {
         data.append('description', description);
       }
       if (stock) {
-        data.append('stock', stock);
+        data.append('stock', `${stock}`);
       }
 
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.productId}`,
         {
           method: 'POST',
           headers: {
@@ -114,14 +102,13 @@ export default function AddProduct({navigation}) {
       if (res.status === 'success') {
         setName(null);
         setPrice(0);
+        setStock(0);
         setFrontImage(null);
         setBackImage(null);
         setSummary(null);
         setDescription(null);
-        setCategoryId('');
-        setCategoryName('No Category');
       } else if (res.status === 'error') {
-        console.log(res);
+        //   console.log(res);
         alert('Server Error');
       }
     } catch (error) {
@@ -130,40 +117,6 @@ export default function AddProduct({navigation}) {
     }
     setIsLoading(false);
   }
-
-  const getAllCategorys = async () => {
-    try {
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/category`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${global.token_prefix} ${session.token}`,
-          },
-        },
-      );
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        setCategoryList(res.data);
-      } else {
-        setCategoryList([]);
-      }
-    } catch (error) {
-      setCategoryList([]);
-    }
-  };
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      getAllCategorys();
-      // getCategoryProductList();
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   const ChooseFrontImage = async () => {
     const result = await launchImageLibrary();
@@ -298,7 +251,7 @@ export default function AddProduct({navigation}) {
           onPress: () => navigation.goBack(),
         }}
         centerComponent={{
-          text: 'Create New Product',
+          text: 'Create New Variant',
           style: {color: 'black', fontSize: 22, justifyContent: 'center'},
         }}
         rightComponent={
@@ -360,7 +313,6 @@ export default function AddProduct({navigation}) {
 
           <TextInput
             style={styles.input}
-            error={nameError}
             label="Product Name"
             autoCapitalize="none"
             mode="outlined"
@@ -373,7 +325,6 @@ export default function AddProduct({navigation}) {
             value={name}
             onChangeText={val => {
               setName(val);
-              setNameError(false);
             }}
             underlineColor=""
           />
@@ -461,44 +412,11 @@ export default function AddProduct({navigation}) {
             onChangeText={val => setDescription(val)}
             underlineColor=""
           />
-          <View style={styles.categoryList}>
-            <List.Section
-              title={`Category :- ${categoryName}`}
-              titleStyle={{color: 'black', fontSize: 17}}>
-              <List.Accordion
-                titleStyle={{color: 'black', fontSize: 18}}
-                title="Select Category"
-                left={props => (
-                  <List.Icon {...props} color="black" icon="view-list" />
-                )}>
-                <RadioButton.Group value={categoryId}>
-                  <View>
-                    <RadioButton.Item
-                      label="No Category"
-                      value={''}
-                      color="red"
-                      onPress={() => {
-                        setCategoryName('No Category');
-                        setCategoryId('');
-                      }}
-                    />
-                    {categoryList.map(data => (
-                      <RadioButton.Item
-                        key={data.name}
-                        label={data.name}
-                        value={data._id}
-                        color="green"
-                        onPress={() => {
-                          setCategoryId(data._id);
-                          setCategoryName(data.name);
-                        }}
-                      />
-                    ))}
-                  </View>
-                </RadioButton.Group>
-              </List.Accordion>
-            </List.Section>
-          </View>
+          <View
+            style={{
+              height: 100,
+              marginBottom: 20,
+            }}></View>
         </View>
       </ScrollView>
     </>
@@ -518,13 +436,5 @@ const styles = StyleSheet.create({
     // height: 50,
     fontSize: 18,
     fontWeight: '500',
-  },
-  categoryList: {
-    width: '92%',
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginTop: 25,
-    backgroundColor: 'rgb(230, 229, 231)',
-    marginBottom: 100,
   },
 });

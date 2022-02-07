@@ -64,11 +64,18 @@ export default function EditProduct({route, navigation}) {
   const [variantName, setVariantName] = useState();
   const [variantNameError, setVariantNameError] = useState();
 
+  const [multi_properties, setMultiProperties] = useState([]);
+
   const [variantPrice, setVariantPrice] = useState();
   const [variantStock, setVariantStock] = useState();
 
   const [variantSummary, setVariantSummary] = useState();
   const [variantDescription, setVariantDescription] = useState();
+
+  // const multi_properties = {
+  //   COLOR: ['Red', 'Green', 'Blue'],
+  //   SIZE: ['Small', 'Medium', 'Large', 'Very Small', 'X-Large', 'XX-Large'],
+  // };
 
   const HandleSubmit = () => {
     Alert.alert('Submit Alert', 'Update Product ?', [
@@ -78,63 +85,6 @@ export default function EditProduct({route, navigation}) {
       {text: 'OK', onPress: () => UploadProduct()},
     ]);
   };
-
-  async function addProductVariant() {
-    if (!variantName) {
-      setVariantNameError(true);
-      return;
-    }
-
-    try {
-      setIsBottomLoading(true);
-      const data = new FormData();
-      if (variantName) {
-        data.append('name', `${variantName}`);
-      }
-      if (variantPrice) {
-        data.append('price', `${variantPrice}`);
-      }
-      if (variantSummary) {
-        data.append('summary', variantSummary);
-      }
-      if (variantDescription) {
-        data.append('description', variantDescription);
-      }
-      if (variantStock) {
-        data.append('stock', variantStock);
-      }
-
-      const session = JSON.parse(
-        await EncryptedStorage.getItem('user_session'),
-      );
-      const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `${global.token_prefix} ${session.token}`,
-          },
-          body: data,
-        },
-      );
-      const res = JSON.parse(await response.text());
-      if (res.status === 'success') {
-        setBottomSheet(false);
-        setVariantName(null);
-        setVariantPrice(null);
-        setVariantStock(null);
-        setVariantSummary(null);
-        setVariantDescription(null);
-        getProduct();
-      } else if (res.status === 'error') {
-        alert('Server Error');
-      }
-    } catch (error) {
-      alert('Error');
-    }
-    setIsBottomLoading(false);
-  }
 
   async function UploadProduct() {
     if (!name) {
@@ -188,8 +138,16 @@ export default function EditProduct({route, navigation}) {
       if (active) {
         data.append('active', active);
       }
-      if (variationName) {
-        data.append('variant_name', variationName);
+      if (multi_properties.length > 0) {
+        let newMultiProperties = {};
+        for (let i in multi_properties) {
+          newMultiProperties[multi_properties[i].name] =
+            multi_properties[i].value;
+
+          data.append();
+        }
+
+        data.append('multi_properties', JSON.stringify(newMultiProperties));
       }
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
@@ -249,6 +207,17 @@ export default function EditProduct({route, navigation}) {
         setDescription(res.data.description);
         setVariationName(res.data.variant_name);
         setVariants(res.data.variants);
+
+        // console.log('Multi Properties', res.data.multi_properties);
+        let mp_arr = [];
+        for (let i in res.data.multi_properties) {
+          let obj = {
+            name: i,
+            value: res.data.multi_properties[i],
+          };
+          mp_arr.push(obj);
+        }
+        setMultiProperties(mp_arr);
       } else {
         alert('Something went wrong!');
       }
@@ -345,11 +314,11 @@ export default function EditProduct({route, navigation}) {
           }}>
           <Image
             source={{
-              uri: frontImageName,
+              uri: `${global.server}/images/${frontImageName}`,
             }}
             style={{
-              width: '40%',
-              height: '40%',
+              width: '100%',
+              height: '100%',
             }}
           />
         </View>
@@ -385,11 +354,11 @@ export default function EditProduct({route, navigation}) {
           }}>
           <Image
             source={{
-              uri: backImageName,
+              uri: `${global.server}/images/${backImageName}`,
             }}
             style={{
-              width: '40%',
-              height: '40%',
+              width: '100%',
+              height: '100%',
             }}
           />
         </View>
@@ -646,8 +615,8 @@ export default function EditProduct({route, navigation}) {
             style={styles.input}
             label="Summary"
             mode="flat"
-            // multiline={true}
-            // numberOfLines={10}
+            multiline={true}
+            numberOfLines={7}
             autoCapitalize="none"
             mode="outlined"
             color="black"
@@ -664,7 +633,8 @@ export default function EditProduct({route, navigation}) {
             style={styles.input}
             label="Description"
             mode="flat"
-            // multiline={true}
+            multiline={true}
+            numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
@@ -716,7 +686,211 @@ export default function EditProduct({route, navigation}) {
             </List.Section>
           </View>
 
-          <TextInput
+          <View
+            style={{
+              width: '92%',
+              marginBottom: 30,
+            }}>
+            <List.Accordion
+              titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
+              title="Properties"
+              // id="1"
+              style={{backgroundColor: 'white'}}>
+              {multi_properties.map((propertie, index) => (
+                <View
+                  key={index}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: 8,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    paddingBottom: 8,
+                  }}>
+                  <View
+                    style={{
+                      width: '90%',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    <TextInput
+                      style={{
+                        width: '70%',
+                        marginTop: 10,
+                      }}
+                      label="Propertie Name"
+                      mode="flat"
+                      autoCapitalize="none"
+                      mode="outlined"
+                      color="black"
+                      selectionColor="black"
+                      underlineColor="gray"
+                      activeUnderlineColor="black"
+                      outlineColor="gray"
+                      activeOutlineColor="black"
+                      value={propertie.name}
+                      underlineColor=""
+                      onChangeText={val => {
+                        let newPro = [];
+                        multi_properties[index].name = val;
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          newPro[i] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                    <IconButton
+                      icon="delete-circle"
+                      color={Colors.red600}
+                      size={32}
+                      onPress={() => {
+                        let newPro = [];
+                        let indi = 0;
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          if (i === index) continue;
+                          newPro[indi++] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                    <IconButton
+                      icon="plus-circle"
+                      color={Colors.blue500}
+                      size={32}
+                      onPress={() => {
+                        let newPro = [];
+                        multi_properties[index].value.push('');
+                        for (let i = 0; i < multi_properties.length; i++) {
+                          newPro[i] = multi_properties[i];
+                        }
+                        setMultiProperties(newPro);
+                      }}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      width: '92%',
+                    }}>
+                    <List.Accordion
+                      titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
+                      title="Values"
+                      // id="1"
+                      style={{backgroundColor: 'white'}}>
+                      {propertie.value.map((v, i) => (
+                        <View
+                          key={i}
+                          style={{
+                            width: '90%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                          }}>
+                          <IconButton
+                            icon="delete"
+                            color={Colors.red400}
+                            size={28}
+                            onPress={() => {
+                              let newValue = [];
+                              let indi = 0;
+                              for (
+                                let j = 0;
+                                j < multi_properties[index].value.length;
+                                j++
+                              ) {
+                                if (j === i) continue;
+                                newValue[indi++] =
+                                  multi_properties[index].value[j];
+                              }
+                              let newPro = [];
+                              multi_properties[index].value = newValue;
+                              for (
+                                let k = 0;
+                                k < multi_properties.length;
+                                k++
+                              ) {
+                                newPro[k] = multi_properties[k];
+                              }
+                              setMultiProperties(newPro);
+                            }}
+                          />
+                          <TextInput
+                            style={{
+                              width: '70%',
+                            }}
+                            label="Propertie Value"
+                            mode="flat"
+                            // multiline={true}
+                            autoCapitalize="none"
+                            mode="outlined"
+                            color="black"
+                            selectionColor="black"
+                            underlineColor="gray"
+                            activeUnderlineColor="black"
+                            outlineColor="gray"
+                            activeOutlineColor="black"
+                            value={String(v)}
+                            underlineColor=""
+                            onChangeText={val => {
+                              let newValue = [];
+                              // propertie.value[i] = val;
+                              multi_properties[index].value[i] = val;
+                              for (let j = 0; j < propertie.value.length; j++) {
+                                newValue[j] = multi_properties[index].value[j];
+                              }
+                              let newPro = [];
+                              multi_properties[index].value = newValue;
+                              for (
+                                let k = 0;
+                                k < multi_properties.length;
+                                k++
+                              ) {
+                                newPro[k] = multi_properties[k];
+                              }
+                              setMultiProperties(newPro);
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </List.Accordion>
+                  </View>
+                </View>
+              ))}
+
+              <Button
+                style={{
+                  width: '100%',
+                  height: 43,
+                  // margin: 10,
+                  marginTop: 5,
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  justifyContent: 'center',
+                  // backgroundColor: '',
+                  // height: 50,
+                  // fontSize: 18,
+                }}
+                icon="plus"
+                mode="outlined"
+                color="black"
+                onPress={() => {
+                  let newPro = [];
+                  for (let i = 0; i < multi_properties.length; i++) {
+                    newPro[i] = multi_properties[i];
+                  }
+                  newPro.push({name: '', value: []});
+                  setMultiProperties(newPro);
+                }}>
+                Add New Propertie
+              </Button>
+            </List.Accordion>
+          </View>
+
+          {/* <TextInput
             style={styles.input}
             label="Variation Type"
             mode="flat"
@@ -732,14 +906,14 @@ export default function EditProduct({route, navigation}) {
             value={variationName}
             onChangeText={val => setVariationName(val)}
             underlineColor=""
-          />
+          /> */}
           <View
             style={{
               width: '92%',
             }}>
             <List.Accordion
               titleStyle={{fontSize: 20, color: 'black', width: '100%'}}
-              title={variationName}
+              title="Variants"
               // id="1"
               style={{backgroundColor: 'white'}}>
               {variants.map((variant, index) => (
@@ -747,13 +921,13 @@ export default function EditProduct({route, navigation}) {
                   <TouchableOpacity
                     onLongPress={() =>
                       navigation.navigate('EditVariant', {
-                        variantId: variant._id,
+                        variant_id: variant._id,
                       })
                     }>
                     <View style={styles.productStyle}>
                       <Image
                         source={{
-                          uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
+                          uri: `${global.server}/images/${variant.front_image}`,
                         }}
                         style={styles.productImage}
                       />
@@ -788,160 +962,19 @@ export default function EditProduct({route, navigation}) {
               borderWidth: 1,
               borderColor: 'gray',
               justifyContent: 'center',
-
-              // backgroundColor: '',
-              // height: 50,
-              // fontSize: 18,
             }}
             icon="book-open-page-variant"
             mode="outlined"
             color="black"
-            onPress={() => setBottomSheet(true)}>
+            onPress={() =>
+              navigation.navigate('AddVariant', {
+                product_id: route.params.product_id,
+              })
+            }>
             Create Variant
           </Button>
         </View>
         <View style={styles.bottomSpace}></View>
-
-        <BottomSheet isVisible={bottomSheet}>
-          <Header
-            backgroundColor="lightgray"
-            barStyle="dark-content"
-            placement="left"
-            leftComponent={{
-              icon: 'close',
-              color: 'black',
-              size: 28,
-              onPress: () => setBottomSheet(false),
-            }}
-            centerComponent={{
-              text: 'Add Variant',
-              style: {color: 'black', fontSize: 22, justifyContent: 'center'},
-            }}
-            rightComponent={{
-              icon: 'check',
-              color: 'black',
-              size: 28,
-              onPress: () => addProductVariant(),
-            }}
-            containerStyle={{
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          />
-          <LoadingBottomPage />
-          <View
-            style={{
-              width: '100%',
-              flex: 1,
-              // justifyContent: 'center',
-              alignItems: 'center',
-              height: 350,
-              backgroundColor: 'rgb(240, 240, 240)',
-            }}>
-            <TextInput
-              style={styles.input}
-              error={variantNameError}
-              label="Variant Name"
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantName}
-              onChangeText={val => {
-                setVariantName(val);
-                setVariantNameError(false);
-              }}
-              underlineColor=""
-            />
-            <View
-              style={{
-                width: '92%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <TextInput
-                style={styles.input}
-                style={{width: '55%'}}
-                autoCapitalize="none"
-                mode="outlined"
-                color="black"
-                selectionColor="black"
-                underlineColor="gray"
-                activeUnderlineColor="black"
-                outlineColor="gray"
-                activeOutlineColor="black"
-                value={variantPrice}
-                onChangeText={val => {
-                  setVariantPrice(val);
-                }}
-                underlineColor=""
-                type="number"
-                keyboardType={'numeric'}
-                label="Variant Price"
-              />
-              <TextInput
-                style={styles.input}
-                style={{width: '35%'}}
-                autoCapitalize="none"
-                mode="outlined"
-                color="black"
-                selectionColor="black"
-                underlineColor="gray"
-                activeUnderlineColor="black"
-                outlineColor="gray"
-                activeOutlineColor="black"
-                value={variantStock}
-                onChangeText={val => {
-                  setVariantStock(val);
-                }}
-                underlineColor=""
-                type="number"
-                keyboardType={'numeric'}
-                label="Variant Stock"
-              />
-            </View>
-
-            <TextInput
-              style={styles.input}
-              label="Variant Summary"
-              mode="flat"
-              // multiline={true}
-              // numberOfLines={10}
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantSummary}
-              onChangeText={val => setVariantSummary(val)}
-              underlineColor=""
-            />
-            <TextInput
-              style={styles.input}
-              label="Variant Description"
-              mode="flat"
-              autoCapitalize="none"
-              mode="outlined"
-              color="black"
-              selectionColor="black"
-              underlineColor="gray"
-              activeUnderlineColor="black"
-              outlineColor="gray"
-              activeOutlineColor="black"
-              value={variantDescription}
-              onChangeText={val => setVariantDescription(val)}
-              underlineColor=""
-            />
-          </View>
-        </BottomSheet>
       </ScrollView>
     </>
   );
@@ -957,7 +990,7 @@ const styles = StyleSheet.create({
     width: '96%',
     padding: 8,
     marginTop: 5,
-    height: 50,
+    // height: 50,
     fontSize: 16,
     fontWeight: '500',
   },

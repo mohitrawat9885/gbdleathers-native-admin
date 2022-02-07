@@ -12,7 +12,6 @@ import {Avatar, Button, List} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-
 export default function Shop({route, navigation}) {
   const [categoryProductList, setCategoryProductList] = useState([]);
   async function getCategoryProductList() {
@@ -98,7 +97,7 @@ export default function Shop({route, navigation}) {
                   image: category.image,
                 })
               }
-              titleStyle={{fontSize: 25, color: 'black'}}
+              titleStyle={{fontSize: 22, color: 'black'}}
               title={category.name}
               id="1"
               style={{backgroundColor: 'white'}}>
@@ -113,18 +112,18 @@ export default function Shop({route, navigation}) {
                     <View style={styles.productStyle}>
                       <Image
                         source={{
-                          uri: `https://media.istockphoto.com/photos/sewing-creating-leather-handmade-wallet-leathercraft-picture-id1283147506?b=1&k=20&m=1283147506&s=170667a&w=0&h=7HwBX_wCJCH1EQBzJyqGhsnFF_7g-wJZMOq5lSUqu6k=`,
+                          uri: `${global.server}/images/${product.front_image}`,
                         }}
                         style={styles.productImage}
                       />
-                      <Text style={{fontSize: 22, marginLeft: 16}}>
+                      <Text style={{fontSize: 20, marginLeft: 16}}>
                         {product.name}
                       </Text>
-                      <View style={{right: 10, position: 'absolute'}}>
+                      {/* <View style={{right: 10, position: 'absolute'}}>
                         <Text style={{fontSize: 18}}>
                           QTR {product.price}.00
                         </Text>
-                      </View>
+                      </View> */}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -213,10 +212,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderWidth: 1,
-    borderColor: 'black',
+    width: 60,
+    height: 60,
+    // borderRadius: 35,
+    // borderWidth: 1,
+    // borderColor: 'black',
   },
 });

@@ -100,7 +100,6 @@ export default function EditCategory({route, navigation}) {
       }
     } catch (error) {
       console.log(error);
-
       alert('Error');
     }
     setIsLoading(false);
@@ -181,7 +180,7 @@ export default function EditCategory({route, navigation}) {
           }}>
           <Image
             source={{
-              uri: ImageName,
+              uri: `${global.server}/images/${ImageName}`,
             }}
             style={{
               width: '100%',
@@ -192,6 +191,7 @@ export default function EditCategory({route, navigation}) {
       );
     }
   }
+
   function LoadingPage() {
     if (isLoading) {
       return (
