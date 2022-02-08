@@ -22,6 +22,9 @@ export default function Profile({navigation}) {
   const [backImage, setBackImage] = useState();
   const [frontImage, setfrontImage] = useState();
 
+  const [frontImage_name, setFrontImageName] = useState();
+  const [backImage_name, setBackImageName] = useState();
+
   const [shopName, setShopName] = useState();
 
   const [numbers, setNumbers] = useState([]);
@@ -55,6 +58,8 @@ export default function Profile({navigation}) {
       console.log(res);
       if (res.status === 'success') {
         console.log(res.data);
+        setFrontImageName(res.data.front_image);
+        setBackImageName(res.data.back_image);
         setShopName(res.data.name);
         setEmails(res.data.emails);
         setNumbers(res.data.numbers);
@@ -176,7 +181,7 @@ export default function Profile({navigation}) {
       return (
         <Image
           source={{
-            uri: `https://media.istockphoto.com/photos/many-tools-of-the-leather-craftsman-picture-id1297871891?b=1&k=20&m=1297871891&s=170667a&w=0&h=l1_XbtJtuI9jcjEcRZ3lyn3v8GAkogWKn2iWaQEORNo=`,
+            uri: `${global.server}/images/${backImage_name}`,
           }}
           style={{width: 380, height: 200}}
         />
@@ -201,7 +206,7 @@ export default function Profile({navigation}) {
       return (
         <Image
           source={{
-            uri: `https://diyprojects.com/wp-content/uploads/2020/12/man-working-leather-using-crafting-diy-leather-craft-SS-Featured-1.jpg`,
+            uri: `${global.server}/images/${frontImage_name}`,
           }}
           style={{
             width: 140,

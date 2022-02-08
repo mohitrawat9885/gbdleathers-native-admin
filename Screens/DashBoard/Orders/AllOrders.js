@@ -10,30 +10,6 @@ const newOrders = [
   {
     name: 'Mohit',
   },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
 ];
 
 export default function AllOrders({navigation}) {
@@ -81,7 +57,7 @@ export default function AllOrders({navigation}) {
             }}
             onPress={() => navigation.navigate('OrderDetail')}>
             <View style={{marginLeft: 6}}>
-              <Text style={{fontSize: 14}}>2021</Text>
+              <Text style={{fontSize: 14}}>2022</Text>
               <Text style={{fontSize: 21, fontWeight: 'bold'}}>5</Text>
               <Text style={{fontSize: 14}}>Dec</Text>
             </View>
@@ -101,7 +77,7 @@ export default function AllOrders({navigation}) {
                 <Text style={{fontSize: 15}}>Total</Text>
                 <Text style={{fontSize: 16, fontWeight: 'bold'}}>$130</Text>
               </View>
-              <Text style={{color: 'pink'}}>Un Defined</Text>
+              <Text style={{color: 'pink'}}>Ordered</Text>
             </View>
           </TouchableOpacity>
         ))}

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button} from 'react-native-paper';
@@ -28,6 +29,15 @@ export default function Profile({navigation}) {
 
   const [galleryImage, setGalleryImage] = useState();
   const [gallery, setGallery] = useState([]);
+
+  const HandleSubmit = id => {
+    Alert.alert('Submit Alert', 'Remove Image ?', [
+      {
+        text: 'Cancel',
+      },
+      {text: 'OK', onPress: () => removeGalleryImage(id)},
+    ]);
+  };
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -57,6 +67,8 @@ export default function Profile({navigation}) {
       console.log(res);
       if (res.status === 'success') {
         console.log(res.data);
+        setfrontImage(res.data.front_image);
+        setBackImage(res.data.back_image);
         setShopName(res.data.name);
         setEmails(res.data.emails);
         setNumbers(res.data.numbers);
@@ -282,7 +294,7 @@ export default function Profile({navigation}) {
           <View style={{backgroundColor: 'lightgray'}}>
             <Image
               source={{
-                uri: `https://media.istockphoto.com/photos/many-tools-of-the-leather-craftsman-picture-id1297871891?b=1&k=20&m=1297871891&s=170667a&w=0&h=l1_XbtJtuI9jcjEcRZ3lyn3v8GAkogWKn2iWaQEORNo=`,
+                uri: `${global.server}/images/${backImage}`,
               }}
               style={{width: 380, height: 200}}
             />
@@ -295,7 +307,7 @@ export default function Profile({navigation}) {
             }}>
             <Image
               source={{
-                uri: `https://diyprojects.com/wp-content/uploads/2020/12/man-working-leather-using-crafting-diy-leather-craft-SS-Featured-1.jpg`,
+                uri: `${global.server}/images/${frontImage}`,
               }}
               style={{
                 width: 140,
@@ -395,10 +407,10 @@ export default function Profile({navigation}) {
                 height: 140,
                 marginBottom: 4,
               }}
-              onLongPress={() => removeGalleryImage(val._id)}>
+              onLongPress={() => HandleSubmit(val._id)}>
               <Image
                 source={{
-                  uri: `https://diyprojects.com/wp-content/uploads/2020/12/man-working-leather-using-crafting-diy-leather-craft-SS-Featured-1.jpg`,
+                  uri: `${global.server}/images/${val.image}`,
                 }}
                 style={{
                   width: 190,

@@ -28,13 +28,60 @@ async function clearStorage() {
 }
 
 export function DrawerContent(props) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [frontImage_name, setFrontImageName] = useState('');
+  const [backImage_name, setBackImageName] = useState('');
+
+  const [shopName, setShopName] = useState('');
+
+  async function getShopProfile() {
+    setIsLoading(true);
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/shop-profile`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      const res = JSON.parse(await response.text());
+      console.log(res);
+      if (res.status === 'success') {
+        console.log(res.data);
+        setFrontImageName(res.data.front_image);
+        setBackImageName(res.data.back_image);
+        setShopName(res.data.name);
+      } else if (res.status === 'error') {
+        alert('Server Error');
+      } else {
+        alert('Unauthorized access');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      alert('Something went wrong');
+    }
+  }
+
   const getProfileDiv = () => {
+    if (isLoading) {
+      getShopProfile();
+      setIsLoading(false);
+    }
     return (
       <>
         <View>
           <Image
             source={{
-              uri: `https://mymodernmet.com/wp/wp-content/uploads/2021/01/diy-leather-craft-projects-and-tools-facebook.jpg`,
+              uri: `${global.server}/images/${backImage_name}`,
             }}
             style={{width: '100%', height: 120}}
           />
@@ -48,7 +95,7 @@ export function DrawerContent(props) {
           }}>
           <Image
             source={{
-              uri: `https://media.istockphoto.com/photos/skilled-leather-manufacture-worker-cutting-some-samples-picture-id1320932798?k=20&m=1320932798&s=612x612&w=0&h=JBxX6sfvXmFqsTYvzdnuh2dv1ZShXB7YBuYqgP5qELA=`,
+              uri: `${global.server}/images/${frontImage_name}`,
             }}
             style={{
               width: 100,
@@ -69,7 +116,7 @@ export function DrawerContent(props) {
             color: 'rgb(90, 90, 90)',
             textAlign: 'center',
           }}>
-          GBD Leathers Admin
+          {shopName}
         </Text>
       </>
     );
@@ -135,39 +182,39 @@ export function DrawerContent(props) {
         </Drawer.Section>
 
         <Drawer.Section title="WorkShops">
-          <DrawerItem
+          {/* <DrawerItem
             icon={({color, size}) => (
               <Icon name="cart-arrow-down" color={color} size={size} />
             )}
-            label="Workshopa"
+            label="Workshop"
             onPress={() => props.navigation.navigate('NewOrders')}
-          />
+          /> */}
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('AllOrders')}
+            onPress={() => props.navigation.navigate('NewOrders')}
             label="All Workshops"
           />
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-eye-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('ProcessingOrders')}
+            onPress={() => props.navigation.navigate('NewOrders')}
             label="Processing Workshop"
           />
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-check-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('DeliveredOrders')}
+            onPress={() => props.navigation.navigate('NewOrders')}
             label="Delivered Workshop"
           />
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-cancel-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('CanceledOrders')}
+            onPress={() => props.navigation.navigate('NewOrders')}
             label="Canceled Workshop"
           />
         </Drawer.Section>

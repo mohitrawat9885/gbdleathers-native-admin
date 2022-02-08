@@ -7,33 +7,6 @@ const newOrders = [
   {
     name: 'Mohit',
   },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
-  {
-    name: 'Mohit',
-  },
 ];
 
 export default function CanceledOrders({navigation}) {
@@ -81,7 +54,7 @@ export default function CanceledOrders({navigation}) {
             }}
             onPress={() => navigation.navigate('OrderDetail')}>
             <View style={{marginLeft: 6}}>
-              <Text style={{fontSize: 14}}>2021</Text>
+              <Text style={{fontSize: 14}}>2022</Text>
               <Text style={{fontSize: 21, fontWeight: 'bold'}}>5</Text>
               <Text style={{fontSize: 14}}>Dec</Text>
             </View>

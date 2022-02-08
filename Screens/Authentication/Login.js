@@ -106,7 +106,6 @@ export default function Login() {
             outlineColor="gray"
             activeOutlineColor="black"
             style={styles.loginInput}
-            keyboardType="email-address"
             value={email}
             onChangeText={data => {
               setEmail(data);
@@ -134,7 +133,7 @@ export default function Login() {
             }}
           />
           <TouchableOpacity style={styles.loginSubmit} onPress={() => Login()}>
-            <Text style={{fontSize: 18, letterSpacing: 3, color: 'black'}}>
+            <Text style={{fontSize: 19, letterSpacing: 3, color: 'black'}}>
               Submit
             </Text>
           </TouchableOpacity>
@@ -197,7 +196,8 @@ const styles = StyleSheet.create({
   loginInput: {
     width: '100%',
     marginTop: 5,
-    height: 40,
+    height: 50,
+    fontSize: 18,
     marginBottom: 20,
     borderWidth: 0,
     borderRadius: 0,
@@ -209,9 +209,10 @@ const styles = StyleSheet.create({
   loginSubmit: {
     width: '100%',
     marginTop: 20,
+    fontSize: 18,
     borderWidth: 1,
     borderColor: 'black',
-    height: 40,
+    height: 45,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

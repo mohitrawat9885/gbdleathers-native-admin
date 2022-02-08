@@ -207,6 +207,17 @@ export default function EditVariant({route, navigation}) {
           }
           setMultiProperties(mp_arr);
         }
+        if (res.data.properties) {
+          let p_arr = [];
+          for (let i in res.data.properties) {
+            let obj = {
+              name: i,
+              value: res.data.properties[i],
+            };
+            p_arr.push(obj);
+          }
+          setProperties(p_arr);
+        }
       } else {
         alert('Something went wrong!', res.message);
       }
@@ -411,7 +422,7 @@ export default function EditVariant({route, navigation}) {
           onPress: () => navigation.goBack(),
         }}
         centerComponent={{
-          text: 'Update Product',
+          text: 'Update Variant',
           style: {color: 'black', fontSize: 22, justifyContent: 'center'},
         }}
         rightComponent={
