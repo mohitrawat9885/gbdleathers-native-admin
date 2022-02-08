@@ -49,6 +49,42 @@ export default function EditCategory({route, navigation}) {
     ]);
   };
 
+  const handleCategoryDelete = () => {
+    Alert.alert('Delete Alert', 'Delete Category ?', [
+      {
+        text: 'Cancel',
+      },
+      {text: 'OK', onPress: () => DeleteCategory()},
+    ]);
+  };
+
+  async function DeleteCategory() {
+    try {
+      setIsLoading(true);
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/category/${route.params.category_id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      if (response.status === 204) {
+        navigation.goBack();
+        return;
+      }
+      alert('Try again!');
+    } catch (error) {
+      alert('Please try again!');
+    }
+    setIsLoading(false);
+  }
+
   async function UploadCategory() {
     if (
       categoryName == undefined ||
@@ -280,6 +316,24 @@ export default function EditCategory({route, navigation}) {
               setCategoryNameError(false);
             }}
           />
+          <Button
+            style={{
+              width: '96%',
+              // height: 43,
+              // margin: 10,
+              padding: 4,
+              marginTop: 8,
+              borderWidth: 1,
+              borderColor: 'red',
+              backgroundColor: 'white',
+              // justifyContent: 'center',
+            }}
+            icon="delete"
+            mode="outlined"
+            color="red"
+            onPress={() => handleCategoryDelete()}>
+            Remove Category
+          </Button>
         </View>
       </ScrollView>
     </>
@@ -296,7 +350,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 8,
     marginTop: 20,
-    marginBottom: 50,
+    marginBottom: 20,
     height: 50,
 
     fontSize: 18,

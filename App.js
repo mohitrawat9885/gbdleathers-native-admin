@@ -13,8 +13,8 @@ import RNRestart from 'react-native-restart';
 
 LogBox.ignoreLogs(['Reanimated 2']);
 
-// global.server = 'http://192.168.43.14:8000';
-global.server = 'https://gbdleathers.com';
+global.server = 'http://192.168.43.14:8000';
+// global.server = 'https://gbdleathers.com';
 
 global.token_prefix = 'Bearer';
 const Stack = createNativeStackNavigator();

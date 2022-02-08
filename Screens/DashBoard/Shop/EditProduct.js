@@ -86,6 +86,42 @@ export default function EditProduct({route, navigation}) {
     ]);
   };
 
+  const handleProductDelete = () => {
+    Alert.alert('Delete Alert', 'Delete Product ?', [
+      {
+        text: 'Cancel',
+      },
+      {text: 'OK', onPress: () => DeleteProduct()},
+    ]);
+  };
+
+  async function DeleteProduct() {
+    try {
+      setIsLoading(true);
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      if (response.status === 204) {
+        navigation.goBack();
+        return;
+      }
+      alert('Try again!');
+    } catch (error) {
+      alert('Please try again!');
+    }
+    setIsLoading(false);
+  }
+
   async function UploadProduct() {
     if (!name) {
       setNameError(true);
@@ -973,7 +1009,27 @@ export default function EditProduct({route, navigation}) {
             }>
             Create Variant
           </Button>
+
+          <Button
+            style={{
+              width: '92%',
+              // height: 43,
+              // margin: 10,
+              padding: 4,
+              marginTop: 20,
+              borderWidth: 1,
+              borderColor: 'red',
+              backgroundColor: 'white',
+              // justifyContent: 'center',
+            }}
+            icon="delete"
+            mode="outlined"
+            color="red"
+            onPress={() => handleProductDelete()}>
+            Remove Product
+          </Button>
         </View>
+
         <View style={styles.bottomSpace}></View>
       </ScrollView>
     </>

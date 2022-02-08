@@ -88,7 +88,7 @@ export default function AddVariant({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.productId}`,
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.product_id}`,
         {
           method: 'POST',
           headers: {
@@ -99,18 +99,19 @@ export default function AddVariant({route, navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
+      console.log('Responce', res);
       if (res.status === 'success') {
         setName(null);
-        setPrice(0);
-        setStock(0);
+        setPrice(null);
+        setStock(null);
         setFrontImage(null);
         setBackImage(null);
         setSummary(null);
         setDescription(null);
-      } else if (res.status === 'error') {
-        //   console.log(res);
+      } else if (res.status === 'faile' || res.status === 'error') {
         alert('Server Error');
       }
+      //   console.log(res);
     } catch (error) {
       console.log(error);
       alert('Error');

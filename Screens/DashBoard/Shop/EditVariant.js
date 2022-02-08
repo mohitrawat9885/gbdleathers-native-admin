@@ -69,6 +69,44 @@ export default function EditVariant({route, navigation}) {
     ]);
   };
 
+  const handleVariantDelete = () => {
+    Alert.alert('Delete Alert', 'Delete permanently ?', [
+      {
+        text: 'Cancel',
+      },
+      {text: 'OK', onPress: () => DeleteVariant()},
+    ]);
+  };
+
+  async function DeleteVariant() {
+    try {
+      setIsLoading(true);
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/product/${route.params.variant_id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      if (response.status === 204) {
+        navigation.goBack();
+        return;
+      }
+      // const res = JSON.parse(await response.text());
+      // console.log(res);
+      alert('Try again!');
+    } catch (error) {
+      alert('Please try again!');
+    }
+    setIsLoading(false);
+  }
+
   async function UploadProduct() {
     // if (!name) {
     //   setNameError(true);
@@ -985,6 +1023,24 @@ export default function EditVariant({route, navigation}) {
               </Button>
             </List.Accordion>
           </View>
+          <Button
+            style={{
+              width: '92%',
+              // height: 43,
+              // margin: 10,
+              padding: 4,
+              marginTop: 20,
+              borderWidth: 1,
+              borderColor: 'red',
+              backgroundColor: 'white',
+              // justifyContent: 'center',
+            }}
+            icon="delete"
+            mode="outlined"
+            color="red"
+            onPress={() => handleVariantDelete()}>
+            Remove Variant
+          </Button>
         </View>
         <View style={styles.bottomSpace}></View>
       </ScrollView>
