@@ -6,14 +6,27 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button, List} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
+
 export default function Shop({route, navigation}) {
   const [categoryProductList, setCategoryProductList] = useState([]);
+
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    getCategoryProductList();
+    setRefreshing(true);
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
   async function getCategoryProductList() {
     try {
       const session = JSON.parse(
@@ -37,7 +50,7 @@ export default function Shop({route, navigation}) {
         setCategoryProductList([]);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setCategoryProductList([]);
     }
   }
@@ -86,7 +99,10 @@ export default function Shop({route, navigation}) {
       />
 
       <View style={{flex: 1, width: '100%', height: '100%', zIndex: 1}}>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           {categoryProductList.map((category, index) => (
             <List.Accordion
               key={index}

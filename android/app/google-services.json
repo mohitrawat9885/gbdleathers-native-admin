@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "601806193305",
+    "project_id": "gbd-leathers",
+    "storage_bucket": "gbd-leathers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601806193305:android:58ec7d536227325690ae08",
+        "android_client_info": {
+          "package_name": "com.gbdadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "601806193305-l9nvbt05cs750pa771254q1dombckrua.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQFPUjwVO2DHF3b_6i_mmred4s6SVxvpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "601806193305-l9nvbt05cs750pa771254q1dombckrua.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

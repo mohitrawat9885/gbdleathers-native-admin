@@ -1,9 +1,12 @@
 import 'react-native-gesture-handler';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Image, LogBox} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {
+  initialWindowMetrics,
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 import Login from './Screens/Authentication/Login';
 import DashBoard from './Screens/DashBoard/DashBoard';
 import SplashScreen from './Screens/SplashScreen/SplashScreen';
@@ -11,16 +14,26 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
 
+import {
+  requestUserPermission,
+  notificationListener,
+} from './Screens/DashBoard/Orders/NotificationManager';
+
 LogBox.ignoreLogs(['Reanimated 2']);
 
-global.server = 'http://192.168.43.14:8000';
-// global.server = 'https://gbdleathers.com';
+// global.server = 'http://192.168.43.14:8000';
+global.server = 'https://gbdleathers.com';
 
 global.token_prefix = 'Bearer';
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    requestUserPermission();
+    notificationListener();
+  }, []);
 
   async function retrieveUserSession() {
     try {

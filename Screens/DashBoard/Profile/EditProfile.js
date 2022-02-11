@@ -55,9 +55,9 @@ export default function Profile({navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log(res);
+      // console.log(res);
       if (res.status === 'success') {
-        console.log(res.data);
+        // console.log(res.data);
         setFrontImageName(res.data.front_image);
         setBackImageName(res.data.back_image);
         setShopName(res.data.name);
@@ -71,7 +71,7 @@ export default function Profile({navigation}) {
       }
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setIsLoading(false);
       alert('Something went wrong');
     }

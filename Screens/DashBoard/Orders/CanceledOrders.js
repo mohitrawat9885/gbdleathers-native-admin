@@ -1,15 +1,97 @@
-import React from 'react';
-import {Text, ScrollView, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  RefreshControl,
+} from 'react-native';
 import {Header} from 'react-native-elements';
+import EncryptedStorage from 'react-native-encrypted-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const newOrders = [
-  {
-    name: 'Mohit',
-  },
-];
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
 
 export default function CanceledOrders({navigation}) {
+  const [canceledOrders, setCanceledOrders] = useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    getOrders('?status=canceled&sort=-ordered_at');
+    setRefreshing(true);
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getOrders('?status=canceled&sort=-ordered_at');
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  async function getOrders(query) {
+    try {
+      const session = JSON.parse(
+        await EncryptedStorage.getItem('user_session'),
+      );
+      const response = await fetch(
+        `${global.server}/api/v1/gbdleathers/shop/orders/${query}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${global.token_prefix} ${session.token}`,
+          },
+        },
+      );
+      const res = JSON.parse(await response.text());
+      if (res.status === 'success') {
+        setCanceledOrders(res.data);
+      } else {
+        alert(res.message);
+      }
+    } catch (err) {
+      // console.log(err);
+      alert('Something went wrong!');
+    }
+  }
+  function getTime(op, d) {
+    const date = new Date(d);
+    if (op === 'time') {
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      let ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = minutes.toString().padStart(2, '0');
+      let strTime = hours + ':' + minutes + ' ' + ampm;
+      return strTime;
+    } else if (op === 'year') {
+      return date.getFullYear();
+    } else if (op === 'date') {
+      if (date.getDate() < 10) {
+        return '0' + date.getDate();
+      }
+      return date.getDate();
+    } else if (op === 'month') {
+      let months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return months[date.getMonth()];
+    }
+  }
   return (
     <>
       <Header
@@ -38,8 +120,11 @@ export default function CanceledOrders({navigation}) {
           alignItems: 'center',
         }}
       />
-      <ScrollView>
-        {newOrders.map((order, index) => (
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        {canceledOrders.map((order, index) => (
           <TouchableOpacity
             key={index}
             style={{
@@ -52,16 +137,31 @@ export default function CanceledOrders({navigation}) {
               borderTopWidth: 2,
               padding: 6,
             }}
-            onPress={() => navigation.navigate('OrderDetail')}>
+            onPress={() =>
+              navigation.navigate('OrderDetail', {
+                order,
+              })
+            }>
             <View style={{marginLeft: 6}}>
-              <Text style={{fontSize: 14}}>2022</Text>
-              <Text style={{fontSize: 21, fontWeight: 'bold'}}>5</Text>
-              <Text style={{fontSize: 14}}>Dec</Text>
+              <Text style={{fontSize: 14}}>
+                {getTime('year', order.ordered_at)}
+              </Text>
+              <Text style={{fontSize: 21, fontWeight: 'bold'}}>
+                {getTime('date', order.ordered_at)}
+              </Text>
+              <Text style={{fontSize: 14}}>
+                {getTime('month', order.ordered_at)}
+              </Text>
             </View>
             <View style={{marginLeft: 16}}>
-              <Text style={{color: 'black', fontWeight: 'bold'}}>10:00 AM</Text>
-              <Text style={{fontSize: 18, color: 'blue'}}>Mohit Rawat</Text>
-              <Text style={{color: 'gray'}}>+91-7895995686</Text>
+              <Text style={{color: 'black', fontWeight: 'bold'}}>
+                {getTime('time', order.ordered_at)}
+              </Text>
+              <Text style={{fontSize: 18, color: 'blue'}}>
+                {order.customer_detail.first_name}{' '}
+                {order.customer_detail.last_name}
+              </Text>
+              <Text style={{color: 'gray'}}>{order.customer_detail.email}</Text>
             </View>
 
             <View
@@ -71,10 +171,15 @@ export default function CanceledOrders({navigation}) {
                 bottom: 10,
               }}>
               <View style={{marginLeft: 16}}>
-                <Text style={{fontSize: 15}}>Total</Text>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>$130</Text>
+                <Text style={{fontSize: 15, textAlign: 'center'}}>Total</Text>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  {order.total_cost.currency}{' '}
+                  {order.total_cost.value.$numberDecimal}
+                </Text>
+                <Text style={{color: 'brown', textAlign: 'center'}}>
+                  {order.status}
+                </Text>
               </View>
-              <Text style={{color: 'red'}}>Canceled</Text>
             </View>
           </TouchableOpacity>
         ))}

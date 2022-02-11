@@ -135,7 +135,7 @@ export default function EditCategory({route, navigation}) {
         alert('Unauthorized access');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Error');
     }
     setIsLoading(false);
@@ -163,7 +163,7 @@ export default function EditCategory({route, navigation}) {
         setImageName(res.data.image);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Something went wrong');
     }
     setIsLoading(false);

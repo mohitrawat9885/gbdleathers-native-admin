@@ -202,11 +202,11 @@ export default function EditProduct({route, navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
       } else if (res.status === 'error') {
-        console.log(res);
+        // console.log(res);
         alert('Server Error');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Error');
     }
     setIsLoading(false);

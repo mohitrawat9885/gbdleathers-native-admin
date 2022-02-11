@@ -121,11 +121,11 @@ export default function AddProduct({navigation}) {
         setCategoryId('');
         setCategoryName('No Category');
       } else if (res.status === 'error') {
-        console.log(res);
+        // console.log(res);
         alert('Server Error');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Error');
     }
     setIsLoading(false);

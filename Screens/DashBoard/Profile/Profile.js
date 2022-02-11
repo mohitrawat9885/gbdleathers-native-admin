@@ -7,12 +7,17 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Header, BottomSheet} from 'react-native-elements';
 import {Avatar, Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
 
 export default function Profile({navigation}) {
   const [bottomSheet, setBottomSheet] = useState(false);
@@ -29,6 +34,14 @@ export default function Profile({navigation}) {
 
   const [galleryImage, setGalleryImage] = useState();
   const [gallery, setGallery] = useState([]);
+
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    getShopProfile();
+    getShopGallary();
+    setRefreshing(true);
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
 
   const HandleSubmit = id => {
     Alert.alert('Submit Alert', 'Remove Image ?', [
@@ -66,7 +79,7 @@ export default function Profile({navigation}) {
       const res = JSON.parse(await response.text());
       console.log(res);
       if (res.status === 'success') {
-        console.log(res.data);
+        // console.log(res.data);
         setfrontImage(res.data.front_image);
         setBackImage(res.data.back_image);
         setShopName(res.data.name);
@@ -80,7 +93,7 @@ export default function Profile({navigation}) {
       }
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setIsLoading(false);
       alert('Something went wrong');
     }
@@ -113,9 +126,9 @@ export default function Profile({navigation}) {
         alert('Unauthorized access');
       }
 
-      console.log(res);
+      // console.log(res);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Something went wrong');
     }
     setIsLoading(false);
@@ -148,7 +161,7 @@ export default function Profile({navigation}) {
         }
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Something went wrong');
     }
     setIsLoading(false);
@@ -184,7 +197,7 @@ export default function Profile({navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log(res);
+      // console.log(res);
       if (res.status === 'success') {
         setBottomSheet(false);
         getShopGallary();
@@ -281,6 +294,9 @@ export default function Profile({navigation}) {
       />
       <LoadingPage />
       <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         contentContainerStyle={{
           alignItems: 'center',
           width: '100%',

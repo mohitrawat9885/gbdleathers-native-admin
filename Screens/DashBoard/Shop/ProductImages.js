@@ -84,7 +84,7 @@ export default function ProductImages({route, navigation}) {
         alert('Unauthorized access');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Something went wrong');
     }
     setIsLoading(false);
@@ -120,7 +120,7 @@ export default function ProductImages({route, navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log(res.data.data);
+      // console.log(res.data.data);
       if (res.status === 'success') {
         setBottomSheet(false);
         setImages(res.data.data);
@@ -130,7 +130,7 @@ export default function ProductImages({route, navigation}) {
         alert('Unauthorized access');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Please Try again!');
     }
     setIsLoading(false);

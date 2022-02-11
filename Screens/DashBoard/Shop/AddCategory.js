@@ -97,7 +97,7 @@ export default function AddCategory({navigation}) {
         alert('Unauthorized access');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       alert('Error');
     }

@@ -98,9 +98,9 @@ export default function EditVariant({route, navigation}) {
         navigation.goBack();
         return;
       }
-      // const res = JSON.parse(await response.text());
+      const res = JSON.parse(await response.text());
       // console.log(res);
-      alert('Try again!');
+      alert('Try again!', res.message);
     } catch (error) {
       alert('Please try again!');
     }
@@ -191,11 +191,11 @@ export default function EditVariant({route, navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
       } else if (res.status === 'error') {
-        console.log(res);
+        // console.log(res);
         alert('Server Error');
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Please try again!');
     }
     setIsLoading(false);
@@ -260,7 +260,7 @@ export default function EditVariant({route, navigation}) {
         alert('Something went wrong!', res.message);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Something went wrong!');
     }
     setIsLoading(false);

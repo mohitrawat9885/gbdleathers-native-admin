@@ -99,7 +99,7 @@ export default function AddVariant({route, navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log('Responce', res);
+      // console.log('Responce', res);
       if (res.status === 'success') {
         setName(null);
         setPrice(null);
@@ -113,7 +113,7 @@ export default function AddVariant({route, navigation}) {
       }
       //   console.log(res);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       alert('Error');
     }
     setIsLoading(false);
