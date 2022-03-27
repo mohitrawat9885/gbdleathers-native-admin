@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';  
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ export default function Login() {
   const [isLoading, setLoading] = useState(false);
 
   async function storeUserSession(token) {
-    try {
+    try { 
       await EncryptedStorage.setItem(
         'user_session',
         JSON.stringify({
@@ -62,13 +63,31 @@ export default function Login() {
       if (res.status === 'success') {
         storeUserSession(res.token);
         setLoading(false);
+
         RNRestart.Restart();
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: "Welcome!",
+          button: 'close',
+        })
       } else {
-        alert('Un Authorized Access');
+        // alert('Un Authorized Access');
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: "Un Authorized Access!",
+          button: 'close',
+        })
         setLoading(false);
       }
     } catch (error) {
-      alert('Check Internet Connection or Restart App');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: "Check Internet Connection or Restart App",
+        button: 'close',
+      })
       setLoading(false);
     }
   }
@@ -133,7 +152,7 @@ export default function Login() {
             }}
           />
           <TouchableOpacity style={styles.loginSubmit} onPress={() => Login()}>
-            <Text style={{fontSize: 19, letterSpacing: 3, color: 'black'}}>
+            <Text style={{fontSize: 16, letterSpacing: 3, color: 'white'}}>
               Submit
             </Text>
           </TouchableOpacity>
@@ -187,35 +206,35 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   loginHeading: {
-    fontSize: 30,
+    fontSize: 28,
     textAlign: 'center',
     color: 'rgb(40, 40, 40)',
     marginTop: 25,
-    marginBottom: 10,
   },
   loginInput: {
     width: '100%',
-    marginTop: 5,
-    height: 50,
-    fontSize: 18,
-    marginBottom: 20,
+    marginTop: 1,
+    height: 35,
+    fontSize: 16,
+    marginBottom: 12,
     borderWidth: 0,
     borderRadius: 0,
   },
   loginLabel: {
-    fontSize: 20,
+    fontSize: 18,
     color: 'black',
   },
   loginSubmit: {
     width: '100%',
     marginTop: 20,
-    fontSize: 18,
-    borderWidth: 1,
-    borderColor: 'black',
-    height: 45,
+    fontSize: 16,
+    // borderWidth: 1,
+    // borderColor: 'black',
+    height: 40,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FC5111'
   },
 
   loadingPage: {

@@ -17,6 +17,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 export default function AddVariant({route, navigation}) {
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +84,7 @@ export default function AddVariant({route, navigation}) {
       if (stock) {
         data.append('stock', `${stock}`);
       }
+      data.append('nothing', 'null');
 
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
@@ -108,13 +110,30 @@ export default function AddVariant({route, navigation}) {
         setBackImage(null);
         setSummary(null);
         setDescription(null);
+        Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'New Variant is Created Successfully!',
+          button: 'close',
+        })
       } else if (res.status === 'faile' || res.status === 'error') {
-        alert('Server Error');
+        // alert('Server Error');
+        Dialog.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: res.message,
+          button: 'close',
+        })
       }
       //   console.log(res);
     } catch (error) {
-      // console.log(error);
-      alert('Error');
+      Dialog.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: "Something went wrong or Internet disconnected!",
+        button: 'close',
+      })
+      // alert('Error');
     }
     setIsLoading(false);
   }
@@ -319,7 +338,7 @@ export default function AddVariant({route, navigation}) {
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -336,13 +355,18 @@ export default function AddVariant({route, navigation}) {
               justifyContent: 'space-between',
             }}>
             <TextInput
-              style={styles.input}
-              style={{width: '55%'}}
+              // style={styles.input}
+              style={{width: '55%',
+              padding: 8,
+              marginTop: 5,
+              // height: 50,
+              fontSize: 18,
+              fontWeight: '500',}}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -356,13 +380,18 @@ export default function AddVariant({route, navigation}) {
               label="Price"
             />
             <TextInput
-              style={styles.input}
-              style={{width: '35%'}}
+              // style={styles.input}
+              style={{width: '35%',
+              padding: 8,
+              marginTop: 5,
+              // height: 50,
+              fontSize: 18,
+              fontWeight: '500',}}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -380,14 +409,14 @@ export default function AddVariant({route, navigation}) {
           <TextInput
             style={styles.input}
             label="Summary"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={7}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -398,14 +427,14 @@ export default function AddVariant({route, navigation}) {
           <TextInput
             style={styles.input}
             label="Description"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"

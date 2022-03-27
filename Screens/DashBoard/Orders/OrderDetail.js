@@ -12,6 +12,7 @@ import {Header} from 'react-native-elements';
 import {Avatar, Button} from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 export default function OrderDetail({route, navigation}) {
   const [order, setOrder] = useState(route.params.order);
@@ -77,14 +78,26 @@ export default function OrderDetail({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        // console.log(res.data.data);
+        Dialog.show({
+          type: (operation !== 'completed') ? ALERT_TYPE.WARNING :  ALERT_TYPE.SUCCESS,
+          title: String(operation).toUpperCase() ,
+          textBody: `Order is now ${operation}`,
+          button: 'close',
+        })
         setOrder(res.data.data);
       } else {
-        alert(res.message);
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: res.message,
+        })
       }
-    } catch (err) {
-      console.log(err);
-      alert('Something went wrong!');
+    } catch (err) { 
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: 'Something went wrong or Internet is disconnected!',
+      })
     }
   }
 
@@ -105,11 +118,24 @@ export default function OrderDetail({route, navigation}) {
       );
       if (response.status === 204) {
         navigation.goBack();
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Success!',
+          textBody: "Order Deleted Successfully!",
+        })
+        return;
       }
-      alert('Try again later');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: 'Something went wrong. Try again later.',
+      })
     } catch (err) {
-      console.log(err);
-      alert('Something went wrong!');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: 'Something went wrong or Internet is disconnected!',
+      })
     }
   }
 

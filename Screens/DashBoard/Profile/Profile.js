@@ -14,6 +14,7 @@ import {Avatar, Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
@@ -151,18 +152,26 @@ export default function Profile({navigation}) {
         },
       );
       if (response.status === 204) {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Gallary Image is removed!',
+        })
         getShopGallary();
       } else {
-        const res = JSON.parse(await response.text());
-        if (res.status === 'error') {
-          alert('Server Error');
-        } else {
-          alert('Unauthorized access');
-        }
+        // const res = JSON.parse(await response.text());
+          Toast.show({
+            type: ALERT_TYPE.WARNING,
+            title: 'Failed!',
+            textBody: 'Failed to remove Gallary Image. Try again!',
+          })
       }
     } catch (error) {
-      // console.log(error);
-      alert('Something went wrong');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: 'Something went wrong or Internet is disconnected!',
+      })
     }
     setIsLoading(false);
   }
@@ -199,16 +208,26 @@ export default function Profile({navigation}) {
       const res = JSON.parse(await response.text());
       // console.log(res);
       if (res.status === 'success') {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Shop Gallary Image is added successfully!',
+        })
         setBottomSheet(false);
         getShopGallary();
-      } else if (res.status === 'error') {
-        alert('Server Error');
-      } else {
-        alert('Unauthorized access');
+      } else{
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: 'Failed to add Gallary Image. Try again!',
+        })
       }
     } catch (error) {
-      console.log(error);
-      alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: 'Something went wrong or Internet is disconnected!',
+      })
     }
     setIsLoading(false);
   }

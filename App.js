@@ -14,15 +14,18 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
 
-import {
-  requestUserPermission,
-  notificationListener,
-} from './Screens/DashBoard/Orders/NotificationManager';
+
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+
+// import {
+//   requestUserPermission,
+//   notificationListener,
+// } from './Screens/DashBoard/Orders/NotificationManager';
 
 LogBox.ignoreLogs(['Reanimated 2']);
 
-// global.server = 'http://192.168.43.14:8000';
-global.server = 'https://gbdleathers.com';
+global.server = 'http://192.168.43.14:8000';
+// global.server = 'https://gbdleathers.com';
 
 global.token_prefix = 'Bearer';
 const Stack = createNativeStackNavigator();
@@ -30,10 +33,10 @@ export default function App() {
   const [isLoading, setLoading] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
 
-  useEffect(() => {
-    requestUserPermission();
-    notificationListener();
-  }, []);
+  // useEffect(() => {
+  //   requestUserPermission();
+  //   notificationListener();
+  // }, []);
 
   async function retrieveUserSession() {
     try {
@@ -55,6 +58,7 @@ export default function App() {
   if (isLoading) {
     retrieveUserSession();
     return (
+
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -70,6 +74,7 @@ export default function App() {
   } else {
     if (isLogin) {
       return (
+        <Root>
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen
@@ -81,9 +86,11 @@ export default function App() {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        </Root>
       );
     } else {
       return (
+        <Root>
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen
@@ -95,6 +102,7 @@ export default function App() {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        </Root>
       );
     }
   }

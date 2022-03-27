@@ -20,6 +20,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 // const createFormData = photo => {
 //   const data = new FormData();
 //   data.append('photo', {
@@ -89,17 +90,38 @@ export default function AddCategory({navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
+        Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'New Category Created Successfully!',
+          button: 'close',
+        })
         setCategoryName(null);
         setImageData(null);
       } else if (res.status === 'error') {
-        alert('Server Error');
-      } else {
-        alert('Unauthorized access');
+        // alert('Server Error');
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Failed!',
+          textBody: `${res.message}`,
+          button: 'close',
+        })
+      } else {  
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Failed!',
+          textBody: res.message,
+          button: 'close',
+        })
+        // alert('Unauthorized access');
       }
     } catch (error) {
-      // console.log(error);
-
-      alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Something went wrong!',
+        button: 'close',
+      })
     }
     setIsLoading(false);
   }

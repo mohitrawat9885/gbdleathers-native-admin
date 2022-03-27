@@ -26,6 +26,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 export default function EditProduct({route, navigation}) {
   const [bottomSheet, setBottomSheet] = useState(false);
@@ -113,11 +114,27 @@ export default function EditProduct({route, navigation}) {
       );
       if (response.status === 204) {
         navigation.goBack();
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Product is Removed',
+          button: 'close',
+        })
         return;
       }
-      alert('Try again!');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Try again!',
+        button: 'close',
+      })
     } catch (error) {
-      alert('Please try again!');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Try again!',
+        button: 'close',
+      })
     }
     setIsLoading(false);
   }
@@ -179,12 +196,13 @@ export default function EditProduct({route, navigation}) {
         for (let i in multi_properties) {
           newMultiProperties[multi_properties[i].name] =
             multi_properties[i].value;
-
           data.append();
         }
-
         data.append('multi_properties', JSON.stringify(newMultiProperties));
+      } else {
+        data.append('multi_properties', '');
       }
+
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
@@ -201,13 +219,27 @@ export default function EditProduct({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Product is Updated!',
+          button: 'close',
+        })
       } else if (res.status === 'error') {
-        // console.log(res);
-        alert('Server Error');
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: res.message,
+          button: 'close',
+        })
       }
     } catch (error) {
-      // console.log(error);
-      alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: "Something went wrong or Internet is disconnected!",
+        button: 'close',
+      })
     }
     setIsLoading(false);
   }
@@ -525,7 +557,7 @@ export default function EditProduct({route, navigation}) {
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -543,13 +575,18 @@ export default function EditProduct({route, navigation}) {
               justifyContent: 'space-between',
             }}>
             <TextInput
-              style={styles.input}
-              style={{width: '55%'}}
+              // style={styles.input}
+              style={{width: '55%',
+              padding: 8,
+              marginTop: 5,
+              // height: 50,
+              fontSize: 16,
+              fontWeight: '500',}}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -563,13 +600,18 @@ export default function EditProduct({route, navigation}) {
               label="Price"
             />
             <TextInput
-              style={styles.input}
-              style={{width: '35%'}}
+              // style={styles.input}
+              style={{width: '35%',
+              padding: 8,
+              marginTop: 5,
+              // height: 50,
+              fontSize: 16,
+              fontWeight: '500',}}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -650,14 +692,14 @@ export default function EditProduct({route, navigation}) {
           <TextInput
             style={styles.input}
             label="Summary"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={7}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -668,14 +710,14 @@ export default function EditProduct({route, navigation}) {
           <TextInput
             style={styles.input}
             label="Description"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -759,12 +801,12 @@ export default function EditProduct({route, navigation}) {
                         marginTop: 10,
                       }}
                       label="Propertie Name"
-                      mode="flat"
+                      // mode="flat"
                       autoCapitalize="none"
                       mode="outlined"
                       color="black"
                       selectionColor="black"
-                      underlineColor="gray"
+                      // underlineColor="gray"
                       activeUnderlineColor="black"
                       outlineColor="gray"
                       activeOutlineColor="black"
@@ -859,13 +901,13 @@ export default function EditProduct({route, navigation}) {
                               width: '70%',
                             }}
                             label="Propertie Value"
-                            mode="flat"
+                            // mode="flat"
                             // multiline={true}
                             autoCapitalize="none"
                             mode="outlined"
                             color="black"
                             selectionColor="black"
-                            underlineColor="gray"
+                            // underlineColor="gray"
                             activeUnderlineColor="black"
                             outlineColor="gray"
                             activeOutlineColor="black"

@@ -19,6 +19,7 @@ import ImagePicker, {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 // const createFormData = photo => {
 //   const data = new FormData();
@@ -76,11 +77,27 @@ export default function EditCategory({route, navigation}) {
       );
       if (response.status === 204) {
         navigation.goBack();
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Category is Removed',
+          button: 'close',
+        })
         return;
       }
-      alert('Try again!');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Try again!',
+        button: 'close',
+      })
     } catch (error) {
-      alert('Please try again!');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Try again!',
+        button: 'close',
+      })
     }
     setIsLoading(false);
   }
@@ -127,16 +144,27 @@ export default function EditCategory({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        // setCategoryName(null);
-        // setImageData(null);
-      } else if (res.status === 'error') {
-        alert('Server Error');
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Category is Updated!',
+          button: 'close',
+        })
       } else {
-        alert('Unauthorized access');
-      }
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: res.message,
+          button: 'close',
+        })
+      } 
     } catch (error) {
-      // console.log(error);
-      alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Failed!',
+        textBody: "Something went wrong or Internet is disconnected!",
+        button: 'close',
+      })
     }
     setIsLoading(false);
   }

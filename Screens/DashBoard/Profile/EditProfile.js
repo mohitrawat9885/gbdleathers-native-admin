@@ -15,6 +15,7 @@ import {Avatar, Button, TextInput} from 'react-native-paper';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 export default function Profile({navigation}) {
   // const data = new FormData();
@@ -109,13 +110,13 @@ export default function Profile({navigation}) {
 
       if (!emails[0]) {
         data.append('emails[]', '');
-        console.log('email null');
+        // console.log('email null');
       } else {
         emails.forEach(item => data.append('emails[]', item));
       }
       if (!numbers[0]) {
         data.append('numbers[]', '');
-        console.log('Number null');
+        // console.log('Number null');
       } else {
         numbers.forEach(item => data.append('numbers[]', item));
       }
@@ -133,16 +134,26 @@ export default function Profile({navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log(res);
+      // console.log(res);
       if (res.status === 'success') {
-      } else if (res.status === 'error') {
-        alert('Server Error');
-      } else {
-        alert('Unauthorized access');
-      }
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Shop Profile is Updated!',
+        })
+      } else  {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Failed!',
+          textBody: res.message
+        })
+      } 
     } catch (error) {
-      console.log(error);
-      alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: "Something went wrong or Internet is disconnected!"
+      })
     }
     setIsLoading(false);
   }

@@ -17,6 +17,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
 
 export default function AddProduct({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
@@ -113,20 +114,40 @@ export default function AddProduct({navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         setName(null);
-        setPrice(0);
+        setPrice(null);
+        setStock(null)
         setFrontImage(null);
         setBackImage(null);
         setSummary(null);
         setDescription(null);
         setCategoryId('');
         setCategoryName('No Category');
+
+        Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'New Product is Created Successfully!',
+          button: 'close',
+        })
       } else if (res.status === 'error') {
         // console.log(res);
-        alert('Server Error');
+        // alert('Server Error');
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: res.message,
+          button: 'close',
+        })
+
       }
     } catch (error) {
       // console.log(error);
       alert('Error');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Failed!',
+        textBody: 'Something went wrong or Internet not connected!',
+      })
     }
     setIsLoading(false);
   }
@@ -366,7 +387,7 @@ export default function AddProduct({navigation}) {
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -384,13 +405,17 @@ export default function AddProduct({navigation}) {
               justifyContent: 'space-between',
             }}>
             <TextInput
-              style={styles.input}
-              style={{width: '55%'}}
+              // style={styles.input}
+              style={{width: '55%', 
+              padding: 8,
+              marginTop: 5,
+              fontSize: 18,
+              fontWeight: '500',}}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -398,19 +423,24 @@ export default function AddProduct({navigation}) {
               onChangeText={val => {
                 setPrice(val);
               }}
-              underlineColor=""
+              // underlineColor=""
               type="number"
               keyboardType={'numeric'}
               label="Price"
             />
             <TextInput
-              style={styles.input}
-              style={{width: '35%'}}
+              // style={styles.input}
+              style={{width: '35%',  
+              padding: 8,
+              marginTop: 5,
+              fontSize: 18,
+              fontWeight: '500'
+            }}
               autoCapitalize="none"
               mode="outlined"
               color="black"
               selectionColor="black"
-              underlineColor="gray"
+              // underlineColor="gray"
               activeUnderlineColor="black"
               outlineColor="gray"
               activeOutlineColor="black"
@@ -428,14 +458,14 @@ export default function AddProduct({navigation}) {
           <TextInput
             style={styles.input}
             label="Summary"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={7}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
@@ -446,14 +476,14 @@ export default function AddProduct({navigation}) {
           <TextInput
             style={styles.input}
             label="Description"
-            mode="flat"
+            // mode="flat"
             multiline={true}
             numberOfLines={10}
             autoCapitalize="none"
             mode="outlined"
             color="black"
             selectionColor="black"
-            underlineColor="gray"
+            // underlineColor="gray"
             activeUnderlineColor="black"
             outlineColor="gray"
             activeOutlineColor="black"
