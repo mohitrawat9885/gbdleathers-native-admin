@@ -188,7 +188,7 @@ export default function EditProduct({route, navigation}) {
       if (stock) {
         data.append('stock', stock);
       }
-      if (active) {
+      if (active == true || active == false) {
         data.append('active', active);
       }
       if (multi_properties.length > 0) {
@@ -202,7 +202,6 @@ export default function EditProduct({route, navigation}) {
       } else {
         data.append('multi_properties', '');
       }
-
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );

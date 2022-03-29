@@ -260,6 +260,19 @@ export default function OrderDetail({route, navigation}) {
                 <Text style={{fontSize: 20, color: 'black'}}>
                   {product.name}
                 </Text>
+                {/* <Text>COLOR: Red</Text> */}
+              </View>
+              <View style={styles.productPropertiesStyle}>
+              {
+                product.properties?.map((v, i) => (
+                  <Text style={{
+                    color: 'rgb(110, 110, 110)',
+                    fontSize: 14
+                  }}>{v.name}: {v.value}</Text>
+                ))
+              }
+             
+                
               </View>
               <View key={index} style={styles.productStyle}>
                 <Image
@@ -430,6 +443,21 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  productPropertiesStyle : {
+    margin: 6,
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
+    borderTopColor: 'lightgray',
+    borderBottomColor: 'lightgray',
+    paddingLeft: 30,
+    width: '98%',
+    // height: 45,
+    backgroundColor: 'white',
+    flex: 1,
+    flexDirection:'column',
+    // alignItems: 'center',
   },
   productImage: {
     width: 70,

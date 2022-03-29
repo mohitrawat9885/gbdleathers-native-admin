@@ -172,7 +172,7 @@ export default function EditVariant({route, navigation}) {
       if (stock) {
         data.append('stock', stock);
       }
-      if (active) {
+      if (active == true || active == false) {
         data.append('active', active);
       }
       if (multi_properties.length > 0) {

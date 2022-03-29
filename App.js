@@ -24,10 +24,11 @@ import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification
 
 LogBox.ignoreLogs(['Reanimated 2']);
 
-global.server = 'http://192.168.43.14:8000';
-// global.server = 'https://gbdleathers.com';
+// global.server = 'http://192.168.43.14:8000';
+global.server = 'https://gbdleathers.com';
 
 global.token_prefix = 'Bearer';
+global.listType = "";
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
@@ -43,6 +44,11 @@ export default function App() {
       const session = await EncryptedStorage.getItem('user_session');
       if (session) {
         setIsLogin(true);
+        global.listType =  await EncryptedStorage.getItem('listType');
+        if(!global.listType){
+          await EncryptedStorage.setItem('listType', 'categorys');
+          global.listType = 'categorys';
+        }
       } else {
         await EncryptedStorage.clear();
         setIsLogin(false);
