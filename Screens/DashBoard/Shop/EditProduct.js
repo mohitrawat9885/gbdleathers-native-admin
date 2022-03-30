@@ -261,8 +261,8 @@ export default function EditProduct({route, navigation}) {
       );
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
-        setCategoryId(res.data.category._id);
-        setCategoryName(res.data.category.name);
+        setCategoryId(res.data.category?._id);
+        setCategoryName(res.data.category?.name);
         setFrontImageName(res.data.front_image);
         setBackImageName(res.data.back_image);
         setName(res.data.name);
@@ -290,6 +290,7 @@ export default function EditProduct({route, navigation}) {
       }
     } catch (error) {
       alert('Something went wrong!');
+      console.log(error)
     }
     setIsLoading(false);
   };

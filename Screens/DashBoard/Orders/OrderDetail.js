@@ -265,7 +265,7 @@ export default function OrderDetail({route, navigation}) {
               <View style={styles.productPropertiesStyle}>
               {
                 product.properties?.map((v, i) => (
-                  <Text style={{
+                  <Text key={i} style={{
                     color: 'rgb(110, 110, 110)',
                     fontSize: 14
                   }}>{v.name}: {v.value}</Text>

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
+  ActivityIndicator
 } from 'react-native';
 import {Header} from 'react-native-elements';
 import EncryptedStorage from 'react-native-encrypted-storage';
@@ -14,25 +15,38 @@ const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 };
 
+const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+  const paddingToBottom = 20;
+  return layoutMeasurement.height + contentOffset.y >=
+    contentSize.height - paddingToBottom;
+};
+
 export default function DeliveredOrders({navigation}) {
   const [completedOrders, setCompletedOrders] = useState([]);
+  const [totalDocument, setTotalDocument] = useState(50);
+  const [pagelimit, setPagelimit] = useState(25);
+  const [orderListLoadingBottom, setOrderListLoadingBottom] = useState(false)
 
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
-    getOrders('?status=completed&sort=-ordered_at');
+    setPagelimit(25)
+    getOrders('?status=completed&sort=-ordered_at&page=1&limit=25', false);
     setRefreshing(true);
     wait(1000).then(() => setRefreshing(false));
   }, []);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getOrders('?status=completed&sort=-ordered_at');
+      getOrders(`?status=completed&sort=-ordered_at&page=1&limit=${pagelimit}`, false);
     });
     return unsubscribe;
   }, [navigation]);
 
-  async function getOrders(query) {
+  async function getOrders(query, fromBottom) {
     try {
+      if(fromBottom){
+        query =  query+ `${pagelimit+20}`;
+      }
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
@@ -49,12 +63,19 @@ export default function DeliveredOrders({navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         setCompletedOrders(res.data);
+        setTotalDocument(res.totalDocument)
+        if(fromBottom === true){
+          setPagelimit((d)=> d+20);
+          setOrderListLoadingBottom(false)
+        }
       } else {
         alert(res.message);
+        setOrderListLoadingBottom(false)
       }
     } catch (err) {
       // console.log(err);
       alert('Something went wrong!');
+      setOrderListLoadingBottom(false)
     }
   }
   function getTime(op, d) {
@@ -93,6 +114,21 @@ export default function DeliveredOrders({navigation}) {
       return months[date.getMonth()];
     }
   }
+  function OrderListLoader(){
+    if(orderListLoadingBottom === true){
+      return (
+        <View style={{
+          height: 58,
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "center"
+        }}><ActivityIndicator size="large" color="gray" /></View>
+      )
+    }
+    else{
+      return<></>
+    }
+  }
   return (
     <>
       <Header
@@ -124,7 +160,15 @@ export default function DeliveredOrders({navigation}) {
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
+        }
+        onScroll={({nativeEvent}) => {
+          if (isCloseToBottom(nativeEvent)  && (totalDocument > pagelimit)) {
+            setOrderListLoadingBottom(true)
+            getOrders(`?status=completed&sort=-ordered_at&page=1&limit=`, true);
+          }
+        }}
+        
+        >
         {completedOrders.map((order, index) => (
           <TouchableOpacity
             key={index}
@@ -184,6 +228,7 @@ export default function DeliveredOrders({navigation}) {
             </View>
           </TouchableOpacity>
         ))}
+        {OrderListLoader()}
       </ScrollView>
     </>
   );

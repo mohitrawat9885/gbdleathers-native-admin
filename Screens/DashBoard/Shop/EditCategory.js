@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import {colors, Header, Icon} from 'react-native-elements';
-import {Avatar, Button, TextInput} from 'react-native-paper';
+import {Avatar, Button, TextInput, Switch} from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 import ImagePicker, {
@@ -40,6 +40,9 @@ export default function EditCategory({route, navigation}) {
   const [categoryName, setCategoryName] = useState();
   const [categoryNameError, setCategoryNameError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [active, setActive] = useState(false);
+  const toggleSwitch = () => setActive(previousState => !previousState);
 
   const HandleSubmit = () => {
     Alert.alert('Submit Alert', 'Update Category ?', [
@@ -131,6 +134,10 @@ export default function EditCategory({route, navigation}) {
         });
       }
       data.append('name', categoryName);
+      if(active === true || active === false){
+        data.append('active', active)
+      }
+     
       const response = await fetch(
         `${global.server}/api/v1/gbdleathers/shop/category/${route.params.category_id}`,
         {
@@ -189,6 +196,7 @@ export default function EditCategory({route, navigation}) {
       if (res.status === 'success') {
         setCategoryName(res.data.name);
         setImageName(res.data.image);
+        setActive(res.data.active)
       }
     } catch (error) {
       // console.log(error);
@@ -344,6 +352,21 @@ export default function EditCategory({route, navigation}) {
               setCategoryNameError(false);
             }}
           />
+          <View style={{
+            width: '90%',
+          display: 'flex',
+          flexDirection: 'row-reverse',
+          marginBottom: 10
+          }}>
+          <Switch
+                trackColor={{false: 'gray', true: 'gray'}}
+                thumbColor={active ? 'green' : 'red'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={active}
+              />
+          </View>
+           
           <Button
             style={{
               width: '96%',
