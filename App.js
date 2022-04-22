@@ -14,8 +14,7 @@ import SplashScreen from './Screens/SplashScreen/SplashScreen';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
 
-
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 // import {
 //   requestUserPermission,
@@ -24,11 +23,12 @@ import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification
 
 LogBox.ignoreLogs(['Reanimated 2']);
 
-// global.server = 'http://192.168.43.14:8000';
-global.server = 'https://gbdleathers.com';
+global.server = 'http://192.168.43.48:8000';
+
+// global.server = 'https://gbdleathers.com';
 
 global.token_prefix = 'Bearer';
-global.listType = "";
+global.listType = '';
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
@@ -44,8 +44,8 @@ export default function App() {
       const session = await EncryptedStorage.getItem('user_session');
       if (session) {
         setIsLogin(true);
-        global.listType =  await EncryptedStorage.getItem('listType');
-        if(!global.listType){
+        global.listType = await EncryptedStorage.getItem('listType');
+        if (!global.listType) {
           await EncryptedStorage.setItem('listType', 'categorys');
           global.listType = 'categorys';
         }
@@ -64,7 +64,6 @@ export default function App() {
   if (isLoading) {
     retrieveUserSession();
     return (
-
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -81,33 +80,33 @@ export default function App() {
     if (isLogin) {
       return (
         <Root>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="DashBoard"
-              component={DashBoard}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="DashBoard"
+                component={DashBoard}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
         </Root>
       );
     } else {
       return (
         <Root>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
         </Root>
       );
     }

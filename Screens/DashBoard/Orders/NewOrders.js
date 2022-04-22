@@ -5,32 +5,33 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import {Header} from 'react-native-elements';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 };
 
 const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
   const paddingToBottom = 20;
-  return layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom;
+  return (
+    layoutMeasurement.height + contentOffset.y >=
+    contentSize.height - paddingToBottom
+  );
 };
-    
 
 export default function NewOrders({navigation}) {
   const [newOrders, setNewOrders] = useState([]);
   const [totalDocument, setTotalDocument] = useState(50);
   const [pagelimit, setPagelimit] = useState(25);
-  const [orderListLoadingBottom, setOrderListLoadingBottom] = useState(false)
+  const [orderListLoadingBottom, setOrderListLoadingBottom] = useState(false);
 
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
-    setPagelimit(25)
+    setPagelimit(25);
     getOrders('?status=ordered&sort=-ordered_at&page=1&limit=25', false);
     setRefreshing(true);
     wait(1000).then(() => setRefreshing(false));
@@ -38,15 +39,18 @@ export default function NewOrders({navigation}) {
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getOrders(`?status=ordered&sort=-ordered_at&page=1&limit=${pagelimit}`, false);
+      getOrders(
+        `?status=ordered&sort=-ordered_at&page=1&limit=${pagelimit}`,
+        false,
+      );
     });
     return unsubscribe;
   }, [navigation]);
 
   async function getOrders(query, fromBottom) {
     try {
-      if(fromBottom){
-        query =  query+ `${pagelimit+20}`;
+      if (fromBottom) {
+        query = query + `${pagelimit + 20}`;
       }
       // console.log(query)
       const session = JSON.parse(
@@ -65,19 +69,19 @@ export default function NewOrders({navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         setNewOrders(res.data);
-        setTotalDocument(res.totalDocument)
-        if(fromBottom === true){
-          setPagelimit((d)=> d+20);
-          setOrderListLoadingBottom(false)
+        setTotalDocument(res.totalDocument);
+        if (fromBottom === true) {
+          setPagelimit(d => d + 20);
+          setOrderListLoadingBottom(false);
         }
         // console.log("page", pagelimit,"docs", totalDocument)
       } else {
         alert(res.message);
-        setOrderListLoadingBottom(false)
+        setOrderListLoadingBottom(false);
       }
     } catch (err) {
       // console.log(err);
-      setOrderListLoadingBottom(false)
+      setOrderListLoadingBottom(false);
       alert('Something went wrong!');
     }
   }
@@ -118,19 +122,21 @@ export default function NewOrders({navigation}) {
       return months[date.getMonth()];
     }
   }
-  function OrderListLoader(){
-    if(orderListLoadingBottom === true){
+  function OrderListLoader() {
+    if (orderListLoadingBottom === true) {
       return (
-        <View style={{
-          height: 58,
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center"
-        }}><ActivityIndicator size="large" color="gray" /></View>
-      )
-    }
-    else{
-      return<></>
+        <View
+          style={{
+            height: 58,
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="gray" />
+        </View>
+      );
+    } else {
+      return <></>;
     }
   }
   return (
@@ -164,12 +170,11 @@ export default function NewOrders({navigation}) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         onScroll={({nativeEvent}) => {
-          if (isCloseToBottom(nativeEvent)  && (totalDocument > pagelimit)) {
-            setOrderListLoadingBottom(true)
+          if (isCloseToBottom(nativeEvent) && totalDocument > pagelimit) {
+            setOrderListLoadingBottom(true);
             getOrders(`?status=ordered&sort=-ordered_at&page=1&limit=`, true);
           }
-        }}
-        >
+        }}>
         {newOrders.map((order, index) => (
           <TouchableOpacity
             key={index}
@@ -189,25 +194,27 @@ export default function NewOrders({navigation}) {
               })
             }>
             <View style={{marginLeft: 6}}>
-              <Text style={{fontSize: 14}}>
+              <Text style={{fontSize: 11}}>
                 {getTime('year', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 21, fontWeight: 'bold'}}>
+              <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                 {getTime('date', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 14}}>
+              <Text style={{fontSize: 12}}>
                 {getTime('month', order.ordered_at)}
               </Text>
             </View>
             <View style={{marginLeft: 16}}>
-              <Text style={{color: 'black', fontWeight: 'bold'}}>
+              <Text style={{fontSize: 12, color: 'black', fontWeight: 'bold'}}>
                 {getTime('time', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 18, color: 'blue'}}>
+              <Text style={{fontSize: 13, color: 'blue'}}>
                 {order.customer_detail.first_name}{' '}
                 {order.customer_detail.last_name}
               </Text>
-              <Text style={{color: 'gray'}}>{order.customer_detail.email}</Text>
+              <Text style={{fontSize: 12, color: 'gray'}}>
+                {order.customer_detail.email}
+              </Text>
             </View>
 
             <View
@@ -217,20 +224,20 @@ export default function NewOrders({navigation}) {
                 bottom: 10,
               }}>
               <View style={{marginLeft: 16}}>
-                <Text style={{fontSize: 15, textAlign: 'center'}}>Total</Text>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                <Text style={{fontSize: 11, textAlign: 'center'}}>Total</Text>
+                <Text style={{fontSize: 11, fontWeight: 'bold'}}>
                   {order.total_cost.currency}{' '}
                   {order.total_cost.value.$numberDecimal}
                 </Text>
-                <Text style={{color: 'brown', textAlign: 'center'}}>
+                <Text
+                  style={{fontSize: 11, color: 'brown', textAlign: 'center'}}>
                   {order.status}
                 </Text>
               </View>
             </View>
-           
           </TouchableOpacity>
         ))}
-         {OrderListLoader()}
+        {OrderListLoader()}
       </ScrollView>
     </>
   );

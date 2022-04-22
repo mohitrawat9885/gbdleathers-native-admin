@@ -14,7 +14,7 @@ import {Avatar, Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
@@ -156,22 +156,22 @@ export default function Profile({navigation}) {
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
           textBody: 'Gallary Image is removed!',
-        })
+        });
         getShopGallary();
       } else {
         // const res = JSON.parse(await response.text());
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: 'Failed!',
-            textBody: 'Failed to remove Gallary Image. Try again!',
-          })
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: 'Failed!',
+          textBody: 'Failed to remove Gallary Image. Try again!',
+        });
       }
     } catch (error) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
         textBody: 'Something went wrong or Internet is disconnected!',
-      })
+      });
     }
     setIsLoading(false);
   }
@@ -212,22 +212,22 @@ export default function Profile({navigation}) {
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
           textBody: 'Shop Gallary Image is added successfully!',
-        })
+        });
         setBottomSheet(false);
         getShopGallary();
-      } else{
+      } else {
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: 'Failed!',
           textBody: 'Failed to add Gallary Image. Try again!',
-        })
+        });
       }
     } catch (error) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
         textBody: 'Something went wrong or Internet is disconnected!',
-      })
+      });
     }
     setIsLoading(false);
   }
@@ -331,7 +331,7 @@ export default function Profile({navigation}) {
               source={{
                 uri: `${global.server}/images/${backImage}`,
               }}
-              style={{width: 380, height: 200}}
+              style={{width: 370, height: 190}}
             />
           </View>
           <View
@@ -345,8 +345,8 @@ export default function Profile({navigation}) {
                 uri: `${global.server}/images/${frontImage}`,
               }}
               style={{
-                width: 140,
-                height: 140,
+                width: 130,
+                height: 130,
                 borderColor: 'white',
                 borderWidth: 5,
                 shadowColor: 'gray',
@@ -361,7 +361,7 @@ export default function Profile({navigation}) {
             style={{
               marginTop: 20,
               marginBottom: 20,
-              fontSize: 23,
+              fontSize: 20,
               textAlign: 'center',
             }}>
             {shopName}
@@ -378,11 +378,11 @@ export default function Profile({navigation}) {
             }}>
             <Avatar.Icon
               style={{backgroundColor: 'white'}}
-              size={38}
+              size={30}
               icon="phone"
               color="blue"
             />
-            <Text style={{fontSize: 16}}>{num}</Text>
+            <Text style={{fontSize: 14}}>{num}</Text>
           </View>
         ))}
         {emails.map((email, index) => (
@@ -396,11 +396,11 @@ export default function Profile({navigation}) {
             }}>
             <Avatar.Icon
               style={{backgroundColor: 'white'}}
-              size={38}
+              size={28}
               icon="email"
               color="blue"
             />
-            <Text style={{fontSize: 16}}>{email}</Text>
+            <Text style={{fontSize: 14}}>{email}</Text>
           </View>
         ))}
 
@@ -413,11 +413,11 @@ export default function Profile({navigation}) {
           }}>
           <Avatar.Icon
             style={{backgroundColor: 'white'}}
-            size={38}
+            size={30}
             icon="map-marker-radius"
             color="blue"
           />
-          <Text style={{fontSize: 16, textAlign: 'center'}}>{address}</Text>
+          <Text style={{fontSize: 14, textAlign: 'center'}}>{address}</Text>
         </View>
 
         <View

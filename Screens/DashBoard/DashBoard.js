@@ -25,6 +25,11 @@ import ProductImages from './Shop/ProductImages';
 import AddVariant from './Shop/AddVariant';
 import EditVariant from './Shop/EditVariant';
 
+import CreateWorkshop from './Workshops/CreateWorkshop';
+import EditWorkshop from './Workshops/EditWorkshop';
+import WorkshopDetail from './Workshops/WorkshopDetail';
+import WorkshopGallary from './Workshops/WorkshopGallary';
+
 const Tab = createBottomTabNavigator();
 function DashHomeTab({route, navigation}) {
   return (
@@ -173,6 +178,34 @@ export default function Dashboard({navigation}) {
         <Stack.Screen
           name="EditVariant"
           component={EditVariant}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="CreateWorkshop"
+          component={CreateWorkshop}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EditWorkshop"
+          component={EditWorkshop}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="WorkshopDetail"
+          component={WorkshopDetail}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="WorkshopGallary"
+          component={WorkshopGallary}
           options={{
             headerShown: false,
           }}
