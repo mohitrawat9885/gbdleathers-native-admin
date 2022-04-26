@@ -12,6 +12,8 @@ import {DrawerContent} from './Drawer/DrawerContent';
 
 import Orders from './Orders/Orders';
 import Workshops from './Workshops/Workshops';
+import AccomplishedWorkshops from './Workshops/AccomplishedWorkshops';
+import AllWorkshops from './Workshops/AllWorkshops';
 import Shop from './Shop/Shop';
 import Profile from './Profile/Profile';
 
@@ -29,6 +31,7 @@ import CreateWorkshop from './Workshops/CreateWorkshop';
 import EditWorkshop from './Workshops/EditWorkshop';
 import WorkshopDetail from './Workshops/WorkshopDetail';
 import WorkshopGallary from './Workshops/WorkshopGallary';
+// import Workshop from './Workshops/Workshops';
 
 const Tab = createBottomTabNavigator();
 function DashHomeTab({route, navigation}) {
@@ -50,6 +53,7 @@ function DashHomeTab({route, navigation}) {
             iconName = 'account';
             size2 = focused ? 49 : 35;
           }
+          // route.params.type = 'upcoming';
           return (
             <Avatar.Icon
               size={size2}
@@ -75,6 +79,7 @@ function DashHomeTab({route, navigation}) {
         options={{
           headerShown: false,
         }}
+        initialParams={{type: 'upcoming'}}
       />
       <Tab.Screen
         name="Shop"
@@ -178,6 +183,20 @@ export default function Dashboard({navigation}) {
         <Stack.Screen
           name="EditVariant"
           component={EditVariant}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="AllWorkshops"
+          component={AllWorkshops}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="AccomplishedWorkshops"
+          component={AccomplishedWorkshops}
           options={{
             headerShown: false,
           }}

@@ -155,7 +155,8 @@ export default function Workshop({route, navigation}) {
               marginBottom: 25,
             }}
             // onStartShouldSetResponder={() => alert('hi')}
-            onPress={() => navigation.navigate('WorkshopDetail')}>
+            // onPress={() => navigation.navigate('WorkshopDetail')}
+          >
             <View
               style={{
                 padding: 5,
@@ -198,31 +199,6 @@ export default function Workshop({route, navigation}) {
                 <Text style={styles.time}>
                   Part:- {route.params.workshop.participants.length}
                 </Text>
-              </View>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingRight: 4,
-                  marginBottom: 10,
-                }}>
-                <View>
-                  <Text style={styles.time}>
-                    {getDateTime(route.params.workshop.start_date, 'date')}
-                  </Text>
-                  <Text style={styles.time}>
-                    {getDateTime(route.params.workshop.start_date, 'time')}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.time}>
-                    {getDateTime(route.params.workshop.end_date, 'date')}
-                  </Text>
-                  <Text style={styles.time}>
-                    {getDateTime(route.params.workshop.end_date, 'time')}
-                  </Text>
-                </View>
                 <Text
                   style={{
                     fontSize: 12,
@@ -230,6 +206,47 @@ export default function Workshop({route, navigation}) {
                   }}>
                   {route.params.workshop.active ? 'Active' : 'In Not Active'}
                 </Text>
+              </View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  paddingRight: 4,
+                  marginBottom: 10,
+                }}>
+                {route.params.workshop.days.map((d, i) => (
+                  <View
+                    key={i}
+                    style={{
+                      padding: 5,
+                      borderWidth: 1,
+                      borderColor: 'lightgray',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginTop: 2,
+                    }}>
+                    <View>
+                      <Text style={styles.time}>
+                        {getDateTime(d.start, 'date')}
+                      </Text>
+                      <Text style={styles.time}>
+                        {getDateTime(d.start, 'time')}
+                      </Text>
+                    </View>
+                    <Text>Day {i + 1}</Text>
+                    <View>
+                      <Text style={styles.time}>
+                        {getDateTime(d.start, 'date')}
+                      </Text>
+                      <Text style={styles.time}>
+                        {getDateTime(d.end, 'time')}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
               </View>
             </View>
             <Image

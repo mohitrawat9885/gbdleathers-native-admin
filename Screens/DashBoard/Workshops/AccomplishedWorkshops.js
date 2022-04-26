@@ -65,7 +65,7 @@ export default function Workshop({route, navigation}) {
         await EncryptedStorage.getItem('user_session'),
       );
       const response = await fetch(
-        `${global.server}/api/v1/gbdleathers/shop/workshop/upcoming/${query}`,
+        `${global.server}/api/v1/gbdleathers/shop/workshop/previous/${query}`,
         {
           method: 'GET',
           headers: {
@@ -188,29 +188,11 @@ export default function Workshop({route, navigation}) {
         barStyle="dark-content"
         placement="left"
         leftComponent={{
-          icon: 'menu',
-          color: 'black',
-          size: 28,
-          onPress: () => navigation.openDrawer(),
-        }}
-        centerComponent={{
-          text: 'Workshops',
+          text: 'Accomplished Workshops',
           style: {color: 'black', fontSize: 21, justifyContent: 'center'},
         }}
         //   rightComponent={{ icon: 'home', color: 'gray', size: 27 }, { icon: 'menu', color: 'gray', size: 27 }}
-        rightComponent={
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('CreateWorkshop')}>
-              <Avatar.Icon
-                style={{backgroundColor: 'white'}}
-                size={38}
-                icon="table-plus"
-                color="gray"
-              />
-            </TouchableOpacity>
-          </View>
-        }
+
         containerStyle={{
           backgroundColor: 'white',
           justifyContent: 'center',

@@ -26,7 +26,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 export default function EditProduct({route, navigation}) {
   const [bottomSheet, setBottomSheet] = useState(false);
@@ -119,7 +119,7 @@ export default function EditProduct({route, navigation}) {
           title: 'Success',
           textBody: 'Product is Removed',
           button: 'close',
-        })
+        });
         return;
       }
       Toast.show({
@@ -127,14 +127,14 @@ export default function EditProduct({route, navigation}) {
         title: 'Failed!',
         textBody: 'Try again!',
         button: 'close',
-      })
+      });
     } catch (error) {
       Toast.show({
         type: ALERT_TYPE.DANGER,
         title: 'Failed!',
         textBody: 'Try again!',
         button: 'close',
-      })
+      });
     }
     setIsLoading(false);
   }
@@ -223,22 +223,22 @@ export default function EditProduct({route, navigation}) {
           title: 'Success',
           textBody: 'Product is Updated!',
           button: 'close',
-        })
+        });
       } else if (res.status === 'error') {
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: 'Failed!',
           textBody: res.message,
           button: 'close',
-        })
+        });
       }
     } catch (error) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
-        textBody: "Something went wrong or Internet is disconnected!",
+        textBody: 'Something went wrong or Internet is disconnected!',
         button: 'close',
-      })
+      });
     }
     setIsLoading(false);
   }
@@ -290,7 +290,7 @@ export default function EditProduct({route, navigation}) {
       }
     } catch (error) {
       alert('Something went wrong!');
-      console.log(error)
+      // console.log(error)
     }
     setIsLoading(false);
   };
@@ -576,12 +576,14 @@ export default function EditProduct({route, navigation}) {
             }}>
             <TextInput
               // style={styles.input}
-              style={{width: '55%',
-              padding: 8,
-              marginTop: 5,
-              // height: 50,
-              fontSize: 16,
-              fontWeight: '500',}}
+              style={{
+                width: '55%',
+                padding: 8,
+                marginTop: 5,
+                // height: 50,
+                fontSize: 16,
+                fontWeight: '500',
+              }}
               autoCapitalize="none"
               mode="outlined"
               color="black"
@@ -601,12 +603,14 @@ export default function EditProduct({route, navigation}) {
             />
             <TextInput
               // style={styles.input}
-              style={{width: '35%',
-              padding: 8,
-              marginTop: 5,
-              // height: 50,
-              fontSize: 16,
-              fontWeight: '500',}}
+              style={{
+                width: '35%',
+                padding: 8,
+                marginTop: 5,
+                // height: 50,
+                fontSize: 16,
+                fontWeight: '500',
+              }}
               autoCapitalize="none"
               mode="outlined"
               color="black"

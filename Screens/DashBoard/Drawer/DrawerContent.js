@@ -193,30 +193,39 @@ export function DrawerContent(props) {
             icon={({color, size}) => (
               <Icon name="file-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('NewOrders')}
+            onPress={() => {
+              // global.workshopType = 'all';
+              props.navigation.navigate('AllWorkshops');
+            }}
             label="All Workshops"
           />
-          <DrawerItem
+          {/* <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-eye-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('NewOrders')}
-            label="Processing Workshop"
-          />
+            onPress={() => {
+              // global.workshopType = 'upcoming';
+              props.navigation.navigate('WorkShops', {type: 'upcoming'});
+            }}
+            label="Upcoming Workshops"
+          /> */}
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-check-outline" color={color} size={size} />
             )}
-            onPress={() => props.navigation.navigate('NewOrders')}
-            label="Delivered Workshop"
+            onPress={() => {
+              // global.workshopType = 'previous';
+              props.navigation.navigate('AccomplishedWorkshops');
+            }}
+            label="Accomplished Workshops"
           />
-          <DrawerItem
+          {/* <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-cancel-outline" color={color} size={size} />
             )}
             onPress={() => props.navigation.navigate('NewOrders')}
             label="Canceled Workshop"
-          />
+          /> */}
         </Drawer.Section>
 
         <Drawer.Section>

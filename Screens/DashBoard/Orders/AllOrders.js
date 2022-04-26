@@ -69,7 +69,7 @@ export default function AllOrders({navigation}) {
           setPagelimit(d => d + 20);
           setOrderListLoadingBottom(false);
         }
-        console.log('page', pagelimit, 'docs', totalDocument);
+        // console.log('page', pagelimit, 'docs', totalDocument);
       } else {
         alert(res.message);
         setOrderListLoadingBottom(false);

@@ -30,22 +30,29 @@ export default function CreateWorkshop({navigation}) {
   const [limit, setLimit] = useState();
   const [summary, setSummary] = useState();
   const [location, setLocation] = useState();
-  const [start_date, setStartDate] = useState(new Date());
 
-  const [end_date, setEndDate] = useState(new Date());
-  const [dateType, setDateType] = useState('start');
+  const [days, setDays] = useState([
+    {
+      start: new Date(),
+      end: new Date(),
+    },
+  ]);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
   const [mode, setMode] = useState('date');
+  const [dateType, setDateType] = useState('start');
+  const [dayIndex, setDayIndex] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [active, setActive] = useState(false);
   const toggleSwitch = () => setActive(previousState => !previousState);
 
-  const showDatePicker = (mode, type) => {
+  const showDatePicker = (mode, type, index) => {
     setMode(mode);
     setDateType(type);
+    setDayIndex(index);
     setDatePickerVisibility(true);
   };
 
@@ -54,19 +61,19 @@ export default function CreateWorkshop({navigation}) {
   };
 
   const handleDateConfirm = date => {
-    if (dateType === 'start') setStartDate(date);
-    else setEndDate(date);
-
-    let d = new Date(date);
-    console.log(
-      'A date has been picked: ',
-      d.toLocaleDateString(),
-      ' ',
-      d.toLocaleTimeString(),
-    );
-    // console.log(date);
-
     hideDatePicker();
+    if (dateType === 'start')
+      setDays(d => {
+        let nd = [...d];
+        nd[dayIndex].start = date;
+        return nd;
+      });
+    else
+      setDays(d => {
+        let nd = [...d];
+        nd[dayIndex].end = date;
+        return nd;
+      });
   };
 
   const HandleSubmit = () => {
@@ -100,10 +107,9 @@ export default function CreateWorkshop({navigation}) {
       data.append('name', name);
       data.append('price', price);
       data.append('limit', limit);
+      days.forEach(day => data.append('days[]', JSON.stringify(day)));
       if (summary) data.append('summary', summary);
       if (location) data.append('location', location);
-      data.append('start_date', `${start_date}`);
-      data.append('end_date', `${end_date}`);
 
       if (active === true || active === false) data.append('active', active);
 
@@ -129,6 +135,7 @@ export default function CreateWorkshop({navigation}) {
         setName(null);
         setSummary(null);
         setLocation(null);
+        setDays([{start: new Date(), end: new Date()}]);
         setLimit(null);
         setPrice(null);
         setImageData(null);
@@ -318,7 +325,9 @@ export default function CreateWorkshop({navigation}) {
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode={mode}
-          date={dateType === 'start' ? start_date : end_date}
+          date={
+            dateType === 'start' ? days[dayIndex]?.start : days[dayIndex]?.end
+          }
           onConfirm={date => {
             handleDateConfirm(date);
           }}
@@ -346,33 +355,93 @@ export default function CreateWorkshop({navigation}) {
             style={{
               width: '95%',
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection: 'column',
               justifyContent: 'space-between',
               alignItems: 'center',
+              borderWidth: 1,
+              borderColor: 'lightgray',
+              padding: 5,
             }}>
-            <View>
-              <TouchableOpacity onPress={() => showDatePicker('date', 'start')}>
-                <Text style={styles.date}>
-                  {getDateTime(start_date, 'date')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => showDatePicker('time', 'start')}>
-                <Text style={styles.date}>
-                  {getDateTime(start_date, 'time')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              <Text style={styles.date}>to</Text>
-            </View>
-            <View>
-              <TouchableOpacity onPress={() => showDatePicker('date', 'end')}>
-                <Text style={styles.date}>{getDateTime(end_date, 'date')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => showDatePicker('time', 'end')}>
-                <Text style={styles.date}>{getDateTime(end_date, 'time')}</Text>
-              </TouchableOpacity>
-            </View>
+            {days?.map((date, i) => (
+              <View
+                key={i}
+                style={{
+                  width: '95%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: 'lightgray',
+                }}>
+                <View>
+                  <TouchableOpacity
+                    onPress={() => showDatePicker('date', 'start', i)}>
+                    <Text style={styles.date}>
+                      {getDateTime(date.start, 'date')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => showDatePicker('time', 'start', i)}>
+                    <Text style={styles.date}>
+                      {getDateTime(date.start, 'time')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View>
+                  <Button
+                    color="gray"
+                    onPress={() =>
+                      setDays(d => {
+                        if (days.length === 1) return d;
+                        let nd = [];
+                        for (let x in d) {
+                          if (x == i) continue;
+                          nd.push(d[x]);
+                        }
+                        return nd;
+                      })
+                    }>
+                    ❌ Day {i + 1}
+                  </Button>
+                </View>
+                <View>
+                  <TouchableOpacity
+                    onPress={() => showDatePicker('date', 'end', i)}>
+                    <Text style={styles.date}>
+                      {getDateTime(date.end, 'date')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => showDatePicker('time', 'end', i)}>
+                    <Text style={styles.date}>
+                      {getDateTime(date.end, 'time')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+            <Button
+              onPress={() =>
+                setDays(d => {
+                  let nd = [...d];
+                  nd.push({
+                    start: new Date(),
+                    end: new Date(),
+                  });
+                  return nd;
+                })
+              }
+              color="gray"
+              style={{
+                borderWidth: 1,
+                marginTop: 5,
+                marginBottom: 5,
+                borderColor: 'lightgray',
+                color: 'gray',
+              }}>
+              Add Day {days.length + 1}
+            </Button>
           </View>
           <TextInput
             style={styles.input}
@@ -522,9 +591,12 @@ const styles = StyleSheet.create({
   },
   date: {
     padding: 8,
-    fontSize: 10,
+    margin: 3,
+    fontSize: 11,
+    // color: 'gray',
     backgroundColor: 'rgb(230, 230, 230)',
-    borderRadius: 12,
+    // borderRadius: 12,
+
     textAlign: 'center',
   },
 });

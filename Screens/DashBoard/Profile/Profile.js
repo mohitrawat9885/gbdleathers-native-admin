@@ -78,7 +78,7 @@ export default function Profile({navigation}) {
         },
       );
       const res = JSON.parse(await response.text());
-      console.log(res);
+      // console.log(res);
       if (res.status === 'success') {
         // console.log(res.data);
         setfrontImage(res.data.front_image);

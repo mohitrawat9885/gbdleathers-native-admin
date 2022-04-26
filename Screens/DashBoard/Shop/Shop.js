@@ -89,7 +89,7 @@ export default function Shop({route, navigation}) {
       if (pos === 'bottom') {
         query = query + `${pagelimit + 10}`;
       }
-      console.log(query);
+      // console.log(query);
       const session = JSON.parse(
         await EncryptedStorage.getItem('user_session'),
       );
@@ -109,7 +109,7 @@ export default function Shop({route, navigation}) {
         setTotalDocument(res.totalDocument);
         if (pos === 'bottom' && pagelimit < res.totalDocument) {
           setPagelimit(p => p + 10);
-          console.log(res.status, pagelimit);
+          // console.log(res.status, pagelimit);
         }
       } else {
         // alert(res.message);

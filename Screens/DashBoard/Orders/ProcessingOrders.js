@@ -77,7 +77,7 @@ export default function ProcessingOrders({navigation}) {
         setOrderListLoadingBottom(false);
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       alert('Something went wrong!');
       setOrderListLoadingBottom(false);
     }

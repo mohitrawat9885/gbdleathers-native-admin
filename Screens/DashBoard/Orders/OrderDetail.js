@@ -12,7 +12,7 @@ import {Header} from 'react-native-elements';
 import {Avatar, Button} from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 export default function OrderDetail({route, navigation}) {
   const [order, setOrder] = useState(route.params.order);
@@ -79,25 +79,26 @@ export default function OrderDetail({route, navigation}) {
       const res = JSON.parse(await response.text());
       if (res.status === 'success') {
         Dialog.show({
-          type: (operation !== 'completed') ? ALERT_TYPE.WARNING :  ALERT_TYPE.SUCCESS,
-          title: String(operation).toUpperCase() ,
+          type:
+            operation !== 'completed' ? ALERT_TYPE.WARNING : ALERT_TYPE.SUCCESS,
+          title: String(operation).toUpperCase(),
           textBody: `Order is now ${operation}`,
           button: 'close',
-        })
+        });
         setOrder(res.data.data);
       } else {
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: 'Failed!',
           textBody: res.message,
-        })
+        });
       }
-    } catch (err) { 
+    } catch (err) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
         textBody: 'Something went wrong or Internet is disconnected!',
-      })
+      });
     }
   }
 
@@ -121,21 +122,21 @@ export default function OrderDetail({route, navigation}) {
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: 'Success!',
-          textBody: "Order Deleted Successfully!",
-        })
+          textBody: 'Order Deleted Successfully!',
+        });
         return;
       }
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
         textBody: 'Something went wrong. Try again later.',
-      })
+      });
     } catch (err) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
         textBody: 'Something went wrong or Internet is disconnected!',
-      })
+      });
     }
   }
 
@@ -214,13 +215,13 @@ export default function OrderDetail({route, navigation}) {
               padding: 6,
             }}>
             <View style={{marginLeft: 6}}>
-              <Text style={{fontSize: 14}}>
+              <Text style={{fontSize: 12}}>
                 {getTime('year', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 21, fontWeight: 'bold'}}>
+              <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                 {getTime('date', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 14}}>
+              <Text style={{fontSize: 13}}>
                 {getTime('month', order.ordered_at)}
               </Text>
             </View>
@@ -228,11 +229,13 @@ export default function OrderDetail({route, navigation}) {
               <Text style={{color: 'black', fontWeight: 'bold'}}>
                 {getTime('time', order.ordered_at)}
               </Text>
-              <Text style={{fontSize: 18, color: 'blue'}}>
+              <Text style={{fontSize: 14, color: 'blue'}}>
                 {order.customer_detail.first_name}{' '}
                 {order.customer_detail.last_name}
               </Text>
-              <Text style={{color: 'gray'}}>{order.customer_detail.email}</Text>
+              <Text style={{fontSize: 12, color: 'gray'}}>
+                {order.customer_detail.email}
+              </Text>
             </View>
 
             <View
@@ -242,12 +245,13 @@ export default function OrderDetail({route, navigation}) {
                 bottom: 10,
               }}>
               <View style={{marginLeft: 16}}>
-                <Text style={{fontSize: 15, textAlign: 'center'}}>Total</Text>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                <Text style={{fontSize: 11, textAlign: 'center'}}>Total</Text>
+                <Text style={{fontSize: 12, fontWeight: 'bold'}}>
                   {order.total_cost.currency}{' '}
                   {order.total_cost.value.$numberDecimal}
                 </Text>
-                <Text style={{color: 'brown', textAlign: 'center'}}>
+                <Text
+                  style={{fontSize: 11, color: 'brown', textAlign: 'center'}}>
                   {order.status}
                 </Text>
               </View>
@@ -257,22 +261,22 @@ export default function OrderDetail({route, navigation}) {
           {order.products.map((product, index) => (
             <View key={index}>
               <View style={styles.productNameStyle}>
-                <Text style={{fontSize: 20, color: 'black'}}>
+                <Text style={{fontSize: 16, color: 'black'}}>
                   {product.name}
                 </Text>
                 {/* <Text>COLOR: Red</Text> */}
               </View>
               <View style={styles.productPropertiesStyle}>
-              {
-                product.properties?.map((v, i) => (
-                  <Text key={i} style={{
-                    color: 'rgb(110, 110, 110)',
-                    fontSize: 14
-                  }}>{v.name}: {v.value}</Text>
-                ))
-              }
-             
-                
+                {product.properties?.map((v, i) => (
+                  <Text
+                    key={i}
+                    style={{
+                      color: 'rgb(110, 110, 110)',
+                      fontSize: 12,
+                    }}>
+                    {v.name}: {v.value}
+                  </Text>
+                ))}
               </View>
               <View key={index} style={styles.productStyle}>
                 <Image
@@ -287,13 +291,13 @@ export default function OrderDetail({route, navigation}) {
                     {':-'}
                     {product.price}
                   </Text>
-                  <Text style={{fontSize: 16}}>
+                  <Text style={{fontSize: 14}}>
                     Quantity:- {product.quantity}
                   </Text>
                 </View>
                 <View style={{marginRight: 10}}>
-                  <Text style={{fontSize: 16}}>Total</Text>
-                  <Text style={{fontSize: 16}}>
+                  <Text style={{fontSize: 12}}>Total</Text>
+                  <Text style={{fontSize: 13}}>
                     {order.total_cost.currency}{' '}
                     {product.price * product.quantity}
                   </Text>
@@ -314,7 +318,7 @@ export default function OrderDetail({route, navigation}) {
               }}>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: 17,
                   fontWeight: 'bold',
                   marginLeft: 10,
                 }}>
@@ -340,12 +344,12 @@ export default function OrderDetail({route, navigation}) {
               }}>
               <Avatar.Icon
                 style={{backgroundColor: 'white'}}
-                size={40}
+                size={30}
                 icon="map-marker-radius"
                 color="blue"
               />
 
-              <Text style={{fontSize: 18, textAlign: 'center'}}>
+              <Text style={{fontSize: 14, textAlign: 'center'}}>
                 {order.address.address_1}, {order.address.address_2},
                 {order.address.city}, {order.address.postal_zip_code}{' '}
                 {order.address.province} {order.address.country}{' '}
@@ -444,7 +448,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  productPropertiesStyle : {
+  productPropertiesStyle: {
     margin: 6,
     marginBottom: 0,
     borderBottomWidth: 1,
@@ -456,14 +460,14 @@ const styles = StyleSheet.create({
     // height: 45,
     backgroundColor: 'white',
     flex: 1,
-    flexDirection:'column',
+    flexDirection: 'column',
     // alignItems: 'center',
   },
   productImage: {
     width: 70,
     height: 70,
-    borderRadius: 35,
-    borderWidth: 1,
-    borderColor: 'black',
+    // borderRadius: 35,
+    // borderWidth: 1,
+    // borderColor: 'black',
   },
 });

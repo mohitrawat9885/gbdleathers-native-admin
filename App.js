@@ -29,6 +29,7 @@ global.server = 'http://192.168.43.48:8000';
 
 global.token_prefix = 'Bearer';
 global.listType = '';
+// global.workshopType = 'upcoming';
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setLoading] = useState(true);
