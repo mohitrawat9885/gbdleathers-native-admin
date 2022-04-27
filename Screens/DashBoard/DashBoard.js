@@ -32,6 +32,7 @@ import EditWorkshop from './Workshops/EditWorkshop';
 import WorkshopDetail from './Workshops/WorkshopDetail';
 import WorkshopGallary from './Workshops/WorkshopGallary';
 // import Workshop from './Workshops/Workshops';
+import ContactUs from './ContactUs/ContactUs';
 
 const Tab = createBottomTabNavigator();
 function DashHomeTab({route, navigation}) {
@@ -225,6 +226,13 @@ export default function Dashboard({navigation}) {
         <Stack.Screen
           name="WorkshopGallary"
           component={WorkshopGallary}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ContactUs"
+          component={ContactUs}
           options={{
             headerShown: false,
           }}

@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
+// import ContactMailIcon from '@mui/icons-material/ContactMail';
 
 async function clearStorage() {
   try {
@@ -182,16 +183,9 @@ export function DrawerContent(props) {
         </Drawer.Section>
 
         <Drawer.Section title="WorkShops">
-          {/* <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="cart-arrow-down" color={color} size={size} />
-            )}
-            label="Workshop"
-            onPress={() => props.navigation.navigate('NewOrders')}
-          /> */}
           <DrawerItem
             icon={({color, size}) => (
-              <Icon name="file-outline" color={color} size={size} />
+              <Icon name="calendar" color={color} size={size} />
             )}
             onPress={() => {
               // global.workshopType = 'all';
@@ -199,16 +193,6 @@ export function DrawerContent(props) {
             }}
             label="All Workshops"
           />
-          {/* <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="file-eye-outline" color={color} size={size} />
-            )}
-            onPress={() => {
-              // global.workshopType = 'upcoming';
-              props.navigation.navigate('WorkShops', {type: 'upcoming'});
-            }}
-            label="Upcoming Workshops"
-          /> */}
           <DrawerItem
             icon={({color, size}) => (
               <Icon name="file-check-outline" color={color} size={size} />
@@ -219,15 +203,16 @@ export function DrawerContent(props) {
             }}
             label="Accomplished Workshops"
           />
-          {/* <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="file-cancel-outline" color={color} size={size} />
-            )}
-            onPress={() => props.navigation.navigate('NewOrders')}
-            label="Canceled Workshop"
-          /> */}
         </Drawer.Section>
-
+        <Drawer.Section>
+          <DrawerItem
+            icon={({color, size}) => (
+              <Icon name="contacts" color={color} size={size} />
+            )}
+            label="Contact Us"
+            onPress={() => props.navigation.navigate('ContactUs')}
+          />
+        </Drawer.Section>
         <Drawer.Section>
           <DrawerItem
             icon={({color, size}) => (
