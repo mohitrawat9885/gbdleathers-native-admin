@@ -17,7 +17,7 @@ import ImagePicker, {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 export default function AddProduct({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +115,7 @@ export default function AddProduct({navigation}) {
       if (res.status === 'success') {
         setName(null);
         setPrice(null);
-        setStock(null)
+        setStock(null);
         setFrontImage(null);
         setBackImage(null);
         setSummary(null);
@@ -128,7 +128,7 @@ export default function AddProduct({navigation}) {
           title: 'Success',
           textBody: 'New Product is Created Successfully!',
           button: 'close',
-        })
+        });
       } else if (res.status === 'error') {
         // console.log(res);
         // alert('Server Error');
@@ -137,8 +137,7 @@ export default function AddProduct({navigation}) {
           title: 'Failed!',
           textBody: res.message,
           button: 'close',
-        })
-
+        });
       }
     } catch (error) {
       // console.log(error);
@@ -147,7 +146,7 @@ export default function AddProduct({navigation}) {
         type: ALERT_TYPE.DANGER,
         title: 'Failed!',
         textBody: 'Something went wrong or Internet not connected!',
-      })
+      });
     }
     setIsLoading(false);
   }
@@ -406,11 +405,13 @@ export default function AddProduct({navigation}) {
             }}>
             <TextInput
               // style={styles.input}
-              style={{width: '55%', 
-              padding: 8,
-              marginTop: 5,
-              fontSize: 18,
-              fontWeight: '500',}}
+              style={{
+                width: '55%',
+                padding: 8,
+                marginTop: 5,
+                fontSize: 18,
+                fontWeight: '500',
+              }}
               autoCapitalize="none"
               mode="outlined"
               color="black"
@@ -430,12 +431,13 @@ export default function AddProduct({navigation}) {
             />
             <TextInput
               // style={styles.input}
-              style={{width: '35%',  
-              padding: 8,
-              marginTop: 5,
-              fontSize: 18,
-              fontWeight: '500'
-            }}
+              style={{
+                width: '35%',
+                padding: 8,
+                marginTop: 5,
+                fontSize: 18,
+                fontWeight: '500',
+              }}
               autoCapitalize="none"
               mode="outlined"
               color="black"
@@ -493,7 +495,7 @@ export default function AddProduct({navigation}) {
           />
           <View style={styles.categoryList}>
             <List.Section
-              title={`Category :- ${categoryName}`}
+              title={`Category : ${categoryName}`}
               titleStyle={{color: 'black', fontSize: 17}}>
               <List.Accordion
                 titleStyle={{color: 'black', fontSize: 18}}

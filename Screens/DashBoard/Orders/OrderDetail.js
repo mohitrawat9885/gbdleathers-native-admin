@@ -288,11 +288,11 @@ export default function OrderDetail({route, navigation}) {
                 <View>
                   <Text style={{fontSize: 16}}>
                     {order.total_cost.currency}
-                    {':-'}
+                    {':'}
                     {product.price}
                   </Text>
                   <Text style={{fontSize: 14}}>
-                    Quantity:- {product.quantity}
+                    Quantity: {product.quantity}
                   </Text>
                 </View>
                 <View style={{marginRight: 10}}>

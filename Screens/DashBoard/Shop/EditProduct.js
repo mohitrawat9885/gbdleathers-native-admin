@@ -731,7 +731,7 @@ export default function EditProduct({route, navigation}) {
           />
           <View style={styles.categoryList}>
             <List.Section
-              title={`Category :- ${categoryName}`}
+              title={`Category : ${categoryName}`}
               titleStyle={{color: 'black', fontSize: 17}}>
               <List.Accordion
                 titleStyle={{color: 'black', fontSize: 18}}

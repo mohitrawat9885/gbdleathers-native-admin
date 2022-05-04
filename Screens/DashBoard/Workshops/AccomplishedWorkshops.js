@@ -280,10 +280,10 @@ export default function Workshop({route, navigation}) {
                     // borderBottomColor: 'lightgray',
                     // borderBottomWidth: 1,
                   }}>
-                  <Text style={styles.time}>QTR:- {workshop.price}</Text>
-                  <Text style={styles.time}>Limit:- {workshop.limit}</Text>
+                  <Text style={styles.time}>QTR: {workshop.price}</Text>
+                  <Text style={styles.time}>Limit: {workshop.limit}</Text>
                   <Text style={styles.time}>
-                    Part:- {workshop.participants.length}
+                    Part: {workshop.participants.length}
                   </Text>
                 </View>
 

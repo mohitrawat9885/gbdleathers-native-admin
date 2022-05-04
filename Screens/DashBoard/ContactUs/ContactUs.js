@@ -306,7 +306,7 @@ export default function ContactUs({navigation}) {
                 style={{
                   fontSize: 14,
                 }}>
-                Message:-
+                Message:
               </Text>
               <Text
                 style={{

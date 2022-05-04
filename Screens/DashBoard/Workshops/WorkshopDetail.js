@@ -191,13 +191,13 @@ export default function Workshop({route, navigation}) {
                   // borderBottomWidth: 1,
                 }}>
                 <Text style={styles.time}>
-                  QTR:- {route.params.workshop.price}
+                  QTR: {route.params.workshop.price}
                 </Text>
                 <Text style={styles.time}>
-                  Limit:- {route.params.workshop.limit}
+                  Limit: {route.params.workshop.limit}
                 </Text>
                 <Text style={styles.time}>
-                  Part:- {route.params.workshop.participants.length}
+                  Part: {route.params.workshop.participants.length}
                 </Text>
                 <Text
                   style={{
@@ -257,7 +257,7 @@ export default function Workshop({route, navigation}) {
                 // borderTopLeftRadius: 3,
               }}
               source={{
-                uri: 'https://cdn.shopify.com/s/files/1/0242/8947/6671/files/103517637_719114572172979_134862011211043319_n_2e2c849b-9860-411f-8798-aa3c758344e4_1024x1024.jpg?v=1635417587',
+                uri: `${global.server}/images/${route.params.workshop.banner}`,
               }}
             />
           </View>

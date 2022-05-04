@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import RNRestart from 'react-native-restart';
-import { ALERT_TYPE, Dialog, Root, Toast } from 'react-native-alert-notification';  
+import {ALERT_TYPE, Dialog, Root, Toast} from 'react-native-alert-notification';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ export default function Login() {
   const [isLoading, setLoading] = useState(false);
 
   async function storeUserSession(token) {
-    try { 
+    try {
       await EncryptedStorage.setItem(
         'user_session',
         JSON.stringify({
@@ -68,26 +68,26 @@ export default function Login() {
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
-          textBody: "Welcome!",
+          textBody: 'Welcome!',
           button: 'close',
-        })
+        });
       } else {
         // alert('Un Authorized Access');
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: 'Failed!',
-          textBody: "Un Authorized Access!",
+          textBody: 'Un Authorized Access!',
           button: 'close',
-        })
+        });
         setLoading(false);
       }
     } catch (error) {
       Toast.show({
         type: ALERT_TYPE.WARNING,
         title: 'Failed!',
-        textBody: "Check Internet Connection or Restart App",
+        textBody: 'Check Internet Connection or Restart App',
         button: 'close',
-      })
+      });
       setLoading(false);
     }
   }
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FC5111'
+    backgroundColor: '#FC5111',
   },
 
   loadingPage: {
